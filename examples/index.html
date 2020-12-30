@@ -95,6 +95,7 @@
 </html>
 -->
 
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -113,11 +114,10 @@
 		</div>
 
 		<script type="module">
-      
-      import * as THREE from "https://cdn.jsdelivr.net/npm/three@v0.108.0/build/three.module.js";
-      import { DeviceOrientationControls } from "https://cdn.jsdelivr.net/npm/three@v0.108.0/examples/jsm/controls/DeviceOrientationControls.js";
 
-
+      import * as THREE from '../build/three.module.js'
+      import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
+      console.log("hello");
 
 			let camera, scene, renderer, controls;
 
