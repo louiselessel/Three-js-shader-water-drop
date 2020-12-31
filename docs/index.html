@@ -147,11 +147,15 @@
         var elapsedSeconds = elapsedMilliseconds / 1000.;
         uniforms.time.value = 60. * elapsedSeconds;
 
-        //uniforms.dropPosition.value.x = camera.getWorldDirection().x;
-        //uniforms.dropPosition.value.y = camera.getWorldDirection().y;
-        //uniforms.dropPosition.value.y = camera.getWorldDirection().z;
-        console.log(document.getElementById('Orientation_b').innerHTML);
-        //document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+        // set info
+        var x = document.getElementById('Orientation_b').innerHTML;
+        var y = document.getElementById('Orientation_g').innerHTML; 
+        if (x != null) {
+          uniforms.dropPosition.value.x = x;
+        } 
+        if (y != null) {
+          uniforms.dropPosition.value.y = y;
+        }
 
         // render static cam
         renderer.render(scene, camera2);
