@@ -58,10 +58,6 @@
         vec2 st = gl_FragCoord.xy/resolution.xy - vec2(0.5);
         vec3 color = vec3(0.5);
 
-        // color for position
-        //if (st.x > dropPosition.x) {color = vec3(0,0,1);}
-        //if (st.y > dropPosition.y) {color = vec3(1,0,0);}
-
         // color the frame so we can see that it takes up the whole screen.
         if (st.x > 0.99) {color = vec3(0,0,1);}
         if (st.x < 0.01) {color = vec3(1,0,0);}
@@ -74,9 +70,6 @@
 
         float x = dropPosition.x;
         float y = dropPosition.y;
-
-        //x = map(dropPosition.x, -90, 90, 0, 1);
-        //y = map(dropPosition.y, -90, 90, 0, 1);
 
         // make moving cross
         if (st.x > x && st.x < x+0.1) {color = vec3(1,0,0);}
@@ -147,10 +140,10 @@
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
         var y = document.getElementById('Orientation_b').innerHTML; 
-        if (x != null) {
+        if (x != null && x < 90 && x > -90) {
           uniforms.dropPosition.value.x = map(x, -90, 90, 0, 1);;
         } 
-        if (y != null) {
+        if (y != null && y < 90 && y > -90) {
           uniforms.dropPosition.value.y = map(y, 90, -90, 0, 1);;
         }
 
