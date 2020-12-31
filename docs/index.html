@@ -145,9 +145,9 @@
       var elapsedMilliseconds = Date.now() - startTime;
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       uniforms.time.value = 60. * elapsedSeconds;
-      //console.log(controls.object);
+      console.log(controls.object);
 
-      //console.log(camera.getWorldDirection());
+      console.log(camera.getWorldDirection());
       //uniforms.dropPosition.value.x = camera.getWorldDirection().x;
       //uniforms.dropPosition.value.y = camera.getWorldDirection().y;
       renderer.render(scene, camera);
