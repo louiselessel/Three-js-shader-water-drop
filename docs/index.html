@@ -100,6 +100,7 @@
 <html lang="en">
 	<head>
     <script src="./hnl.mobileConsole.js"></script> 
+    
 		<title>Shader drop</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -108,18 +109,6 @@
       if (!mobileConsole.status.initialized) {
           mobileConsole.init();
       }
-      function traceThis() {
-          var variable = 'string';
-          function bar() {
-              console.trace();
-          }
-          function foo() {
-              bar(variable);
-          }
-          foo();
-      }
-
-      var testObject = { 'test' : 'one', 'func' : function() {return 'Hello world'; },'array' : [1,2,3,4,5, [1,2,3]], 'emptyArray' : [], 'object' : {'anotherObject' : 'Why not', 'emptyObject' : {}}, 'finalkey' : 'finalvalue'}
     </script>
 	</head>
 	<body>
