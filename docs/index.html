@@ -99,10 +99,28 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+    <script src="./hnl.mobileConsole.js"></script> 
 		<title>Shader drop</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <script>
+      if (!mobileConsole.status.initialized) {
+          mobileConsole.init();
+      }
+      function traceThis() {
+          var variable = 'string';
+          function bar() {
+              console.trace();
+          }
+          function foo() {
+              bar(variable);
+          }
+          foo();
+      }
+
+      var testObject = { 'test' : 'one', 'func' : function() {return 'Hello world'; },'array' : [1,2,3,4,5, [1,2,3]], 'emptyArray' : [], 'object' : {'anotherObject' : 'Why not', 'emptyObject' : {}}, 'finalkey' : 'finalvalue'}
+    </script>
 	</head>
 	<body>
 		<div id="overlay">
@@ -133,6 +151,7 @@
 
 		<script type="module">
 
+
       import * as THREE from './build/three.module.js'
       import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
       console.log("hello");
@@ -161,6 +180,8 @@
 				controls = new DeviceOrientationControls( camera );
 
         scene = new THREE.Scene();
+
+
         
 
         /* SHADER STUFF */
@@ -226,6 +247,7 @@
 				controls.update();
         renderer.render( scene, camera );
         render();
+        console.log(camera.getWorldDirection());
 
       }
 
