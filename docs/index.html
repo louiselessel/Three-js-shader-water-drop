@@ -71,10 +71,10 @@
       const overlay = document.getElementById('overlay');
       overlay.remove();
 
-      //camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
       
-      camera = new THREE.Camera();
-      camera.position.z = 1;
+      //camera = new THREE.Camera();
+      //camera.position.z = 1;
       
       controls = new DeviceOrientationControls(camera);
       scene = new THREE.Scene();
