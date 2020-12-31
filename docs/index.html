@@ -48,7 +48,7 @@
       }
     </script>
 
-  <script id="fragmentShader" type="x-shader/x-fragment">
+    <script id="fragmentShader" type="x-shader/x-fragment">
       uniform vec2 resolution;
       uniform float time;
       uniform vec3 dropPosition;
@@ -88,81 +88,83 @@
     }
    </script>
 
-   <script type="module">
-    import * as THREE from './build/three.module.js'
-    console.log("hello");
+    <script type="module">
+      import * as THREE from './build/three.module.js'
+      console.log("hello");
 
-    let scene, renderer, controls;
-    var startTime;
-    var uniforms, material2, mesh2;
-    let camera2;
-    init();
-    animate();
-    startTime = Date.now();
+      let scene, renderer, controls;
+      var startTime;
+      var uniforms, material2, mesh2;
+      let camera2;
+      init();
+      animate();
+      startTime = Date.now();
 
-    function init() {
-      /* SETUP */
-      camera2 = new THREE.Camera();
-      camera2.position.z = 1;
-      scene = new THREE.Scene();
+      function init() {
+        /* SETUP */
+        camera2 = new THREE.Camera();
+        camera2.position.z = 1;
+        scene = new THREE.Scene();
 
-      /* SHADER STUFF */
-      uniforms = {
-        time: { type: "f", value: 1.0 },
-        resolution: { type: "v2", value: new THREE.Vector2() },
-        dropPosition: { type: "v2", value: new THREE.Vector2() }
-      };
+        /* SHADER STUFF */
+        uniforms = {
+          time: { type: "f", value: 1.0 },
+          resolution: { type: "v2", value: new THREE.Vector2() },
+          dropPosition: { type: "v2", value: new THREE.Vector2() }
+        };
 
-      material2 = new THREE.ShaderMaterial({
-        uniforms: uniforms,
-        vertexShader: document.getElementById('vertexShader').textContent,
-        fragmentShader: document.getElementById('fragmentShader').textContent
-      });
+        material2 = new THREE.ShaderMaterial({
+          uniforms: uniforms,
+          vertexShader: document.getElementById('vertexShader').textContent,
+          fragmentShader: document.getElementById('fragmentShader').textContent
+        });
 
-      mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material2);
-      scene.add(mesh2);
+        mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material2);
+        scene.add(mesh2);
 
-      uniforms.resolution.value.x = window.innerWidth;
-      uniforms.resolution.value.y = window.innerHeight;
-      uniforms.dropPosition.value.x = 0.5;
-      uniforms.dropPosition.value.y = 0.5;
-      uniforms.dropPosition.value.z = 0.5;
-      /* END SHADER STUFF */
+        uniforms.resolution.value.x = window.innerWidth;
+        uniforms.resolution.value.y = window.innerHeight;
+        uniforms.dropPosition.value.x = 0.5;
+        uniforms.dropPosition.value.y = 0.5;
+        uniforms.dropPosition.value.z = 0.5;
+        /* END SHADER STUFF */
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-      window.addEventListener('resize', onWindowResize, false);
-    }
+        window.addEventListener('resize', onWindowResize, false);
+      }
 
-    function animate() {
-      window.requestAnimationFrame(animate);
-      render();
-    }
-    
-    function render() {
-      var elapsedMilliseconds = Date.now() - startTime;
-      var elapsedSeconds = elapsedMilliseconds / 1000.;
-      uniforms.time.value = 60. * elapsedSeconds;
-      
-      //uniforms.dropPosition.value.x = camera.getWorldDirection().x;
-      //uniforms.dropPosition.value.y = camera.getWorldDirection().y;
-      //uniforms.dropPosition.value.y = camera.getWorldDirection().z;
+      function animate() {
+        window.requestAnimationFrame(animate);
+        render();
+      }
 
-      // render static cam
-      renderer.render(scene, camera2);
-    }
+      function render() {
+        var elapsedMilliseconds = Date.now() - startTime;
+        var elapsedSeconds = elapsedMilliseconds / 1000.;
+        uniforms.time.value = 60. * elapsedSeconds;
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      uniforms.resolution.value.x = window.innerWidth;
-      uniforms.resolution.value.y = window.innerHeight;
-      renderer.setSize(window.innerWidth, window.innerHeight);      
-    }
-  </script>
+        //uniforms.dropPosition.value.x = camera.getWorldDirection().x;
+        //uniforms.dropPosition.value.y = camera.getWorldDirection().y;
+        //uniforms.dropPosition.value.y = camera.getWorldDirection().z;
+        console.log(document.getElementById('Orientation_b').innerHTML);
+        //document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+
+        // render static cam
+        renderer.render(scene, camera2);
+      }
+
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        uniforms.resolution.value.x = window.innerWidth;
+        uniforms.resolution.value.y = window.innerHeight;
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+    </script>
 
     <div class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
@@ -268,6 +270,7 @@
     };
   </script>
 </body>
+
 </html>
 
 
