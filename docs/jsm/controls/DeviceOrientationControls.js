@@ -129,7 +129,7 @@ var DeviceOrientationControls = function ( object ) {
 				var orient = scope.screenOrientation ? MathUtils.degToRad( scope.screenOrientation ) : 0; // O
 				
 				setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
-				console.log(alpha);
+				console.log(alpha + ", " + beta + ", " + gamma);
 				if ( 8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
 					lastQuaternion.copy( scope.object.quaternion );
