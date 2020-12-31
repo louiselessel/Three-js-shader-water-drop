@@ -1,3 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Shader drop</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+  <div id="overlay">
+    <button id="startButton">Start Demo</button>
+  </div>
+  <div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - equirectangular panorama demo with
+    DeviceOrientation controls.<br />
+    photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón
+      Ragnarsson</a>.
+  </div>
+
+  <script id="vertexShader" type="x-shader/x-vertex">
+      uniform float time;
+      uniform vec2 resolution;
+      uniform vec2 dropPosition;
+      void main()	{
+          gl_Position = vec4(position, 1.0 );
+      }
+    </script>
+
+  <script id="fragmentShader" type="x-shader/x-fragment">
+      uniform vec2 resolution;
+      uniform float time;
+      uniform vec2 dropPosition;
+
+      float circle(in vec2 _st, in float _radius){
+          vec2 dist = _st-vec2(dropPosition.x, dropPosition.y);
+          //vec2 dist = _st-vec2(0,-1);
+        return 1.-smoothstep(_radius-(_radius*0.01),
+                              _radius+(_radius*0.01),
+                              dot(dist,dist)*4.0);
+      }
+
+      void main(){
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        vec3 color = vec3(circle(st,0.5));
+        gl_FragColor = vec4(color, 1.0);
+      }
+   </script>
+
+  <script type="module">
+
+    import * as THREE from './build/three.module.js'
+    import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
+    console.log("hello");
+
+    let camera, scene, renderer, controls;
+    var startTime;
+    var uniforms, material2, mesh2;
+
+    const startButton = document.getElementById('startButton');
+    startButton.addEventListener('click', function () {
+      init();
+      animate();
+      startTime = Date.now();
+    }, false);
+
+    function init() {
+      /* SETUP */
+      const overlay = document.getElementById('overlay');
+      overlay.remove();
+
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+      controls = new DeviceOrientationControls(camera);
+      scene = new THREE.Scene();
+
+
+      /* SHADER STUFF */
+      uniforms = {
+        time: { type: "f", value: 1.0 },
+        resolution: { type: "v2", value: new THREE.Vector2() },
+        dropPosition: { type: "v2", value: new THREE.Vector2() }
+      };
+
+      material2 = new THREE.ShaderMaterial({
+        uniforms: uniforms,
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragmentShader').textContent
+      });
+
+      mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material2);
+      scene.add(mesh2);
+
+      uniforms.resolution.value.x = window.innerWidth;
+      uniforms.resolution.value.y = window.innerHeight;
+      /* END SHADER STUFF */
+
+
+
+      const geometry = new THREE.SphereBufferGeometry(500, 60, 40);
+      // invert the geometry on the x-axis so that all of the faces point inward
+      geometry.scale(- 1, 1, 1);
+
+      const material = new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load('textures/2294472375_24a3b8ef46_o.jpg')
+      });
+
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+
+
+
+      /* GEOMETRICAL LINES */
+      /*
+      const helperGeometry = new THREE.BoxBufferGeometry( 100, 100, 100, 4, 4, 4 );
+      const helperMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff, wireframe: true } );
+      const helper = new THREE.Mesh( helperGeometry, helperMaterial );
+      scene.add( helper );
+      */
+
+      //
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      //
+
+      window.addEventListener('resize', onWindowResize, false);
+
+
+    }
+
+    function animate() {
+
+      window.requestAnimationFrame(animate);
+
+      controls.update();
+      renderer.render(scene, camera);
+      render();
+      console.log(camera.getWorldDirection());
+
+    }
+
+    function render() {
+      var elapsedMilliseconds = Date.now() - startTime;
+      var elapsedSeconds = elapsedMilliseconds / 1000.;
+      uniforms.time.value = 60. * elapsedSeconds;
+
+      uniforms.dropPosition.value.x = camera.getWorldDirection().x;
+      uniforms.dropPosition.value.y = camera.getWorldDirection().y;
+      renderer.render(scene, camera);
+    }
+
+    function onWindowResize() {
+
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // shader resolution update
+      
+    }
+  </script>
+
+
+</body>
+
+</html>
+
+
 <!--
 
 <html lang="en">
@@ -94,161 +267,3 @@
 
 </html>
 -->
-
-
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<title>Shader drop</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css">
-	</head>
-	<body>
-		<div id="overlay">
-			<button id="startButton">Start Demo</button>
-		</div>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - equirectangular panorama demo with DeviceOrientation controls.<br/>
-			photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">Jón Ragnarsson</a>.
-		</div>
-
-    <script id="vertexShader" type="x-shader/x-vertex">
-      uniform float time;
-      uniform vec2 resolution;
-      void main()	{
-          gl_Position = vec4( position, 1.0 );
-      }
-    </script>
-
-    <script id="fragmentShader" type="x-shader/x-fragment">
-      uniform float time;
-      uniform vec2 resolution;
-      void main()	{
-          float x = mod(time + gl_FragCoord.x, 20.) < 10. ? 1. : 0.;
-          float y = mod(time + gl_FragCoord.y, 20.) < 10. ? 1. : 0.;
-          gl_FragColor = vec4(vec3(min(x, y)), 1.);
-      }
-   </script>
-
-		<script type="module">
-
-
-      import * as THREE from './build/three.module.js'
-      import { DeviceOrientationControls } from './jsm/controls/DeviceOrientationControls.js';
-      console.log("hello");
-
-      let camera, scene, renderer, controls;
-      var startTime;
-      var uniforms, material2, mesh2;
-
-			const startButton = document.getElementById( 'startButton' );
-			startButton.addEventListener( 'click', function () {
-
-				init();
-        animate();
-        startTime = Date.now();
-        
-
-			}, false );
-
-			function init() {
-        /* SETUP */
-				const overlay = document.getElementById( 'overlay' );
-				overlay.remove();
-
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
-        
-				controls = new DeviceOrientationControls( camera );
-
-        scene = new THREE.Scene();
-
-
-        
-
-        /* SHADER STUFF */
-        uniforms = {
-          time: { type: "f", value: 1.0 },
-          resolution: { type: "v2", value: new THREE.Vector2() }
-        };
-
-        material2 = new THREE.ShaderMaterial({
-          uniforms: uniforms,
-          vertexShader: document.getElementById('vertexShader').textContent,
-          fragmentShader: document.getElementById('fragmentShader').textContent
-        });
-
-        mesh2 = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material2);
-        /*scene.add(mesh2);*/
-
-        uniforms.resolution.value.x = window.innerWidth;
-        uniforms.resolution.value.y = window.innerHeight;
-        /* END SHADER STUFF */
-
-
-
-				const geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
-				// invert the geometry on the x-axis so that all of the faces point inward
-				geometry.scale( - 1, 1, 1 );
-
-				const material = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' )
-				} );
-
-				const mesh = new THREE.Mesh( geometry, material);
-        scene.add( mesh );
-        
-
-
-        /* GEOMETRICAL LINES */
-        /*
-				const helperGeometry = new THREE.BoxBufferGeometry( 100, 100, 100, 4, 4, 4 );
-				const helperMaterial = new THREE.MeshBasicMaterial( { color: 0xff00ff, wireframe: true } );
-				const helper = new THREE.Mesh( helperGeometry, helperMaterial );
-        scene.add( helper );
-        */
-
-				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-
-			}
-
-			function animate() {
-
-				window.requestAnimationFrame( animate );
-
-				controls.update();
-        renderer.render( scene, camera );
-        render();
-        console.log(camera.getWorldDirection());
-
-      }
-
-      function render() {
-      var elapsedMilliseconds = Date.now() - startTime;
-      var elapsedSeconds = elapsedMilliseconds / 1000.;
-      uniforms.time.value = 60. * elapsedSeconds;
-      renderer.render(scene, camera);
-      }
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-		</script>
-	</body>
-</html>
