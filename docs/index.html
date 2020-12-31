@@ -41,6 +41,7 @@
 
         // color for position
         if (st.x > dropPosition.x) {color = vec3(0,0,1);}
+        if (st.y > dropPosition.y) {color = vec3(1,0,0);}
 
         // color the frame we can see that it take up the whole screen.
         if (st.x > 0.99) {color = vec3(0,0,1);}
@@ -149,6 +150,7 @@
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       uniforms.time.value = 60. * elapsedSeconds;
       console.log(controls.object);
+      console.log("cam get world: ");
       console.log(camera.getWorldDirection());
       uniforms.dropPosition.value.x = camera.getWorldDirection().x;
       uniforms.dropPosition.value.y = camera.getWorldDirection().y;
