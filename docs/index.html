@@ -145,8 +145,8 @@
         uniforms.time.value = 60. * elapsedSeconds;
 
         // set info
-        var x = document.getElementById('Orientation_b').innerHTML;
-        var y = document.getElementById('Orientation_g').innerHTML; 
+        var x = document.getElementById('Orientation_g').innerHTML;
+        var y = document.getElementById('Orientation_b').innerHTML; 
         if (x != null) {
           uniforms.dropPosition.value.x = map(x, -90, 90, 0, 1);;
         } 
