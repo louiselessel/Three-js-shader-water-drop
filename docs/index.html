@@ -44,6 +44,10 @@
       void main(){
         vec2 st = gl_FragCoord.xy/resolution.xy;
         vec3 color = vec3(circle(st,0.5));
+        if (st.x > 0.9) {color = vec3(0,0,1);}
+        if (st.x < 0.1) {color = vec3(1,0,0);}
+        if (st.y > 0.9) {color = vec3(0,0,1);}
+        if (st.y < 0.1) {color = vec3(1,0,0);}
         gl_FragColor = vec4(color, 1.0);
       }
    </script>
@@ -125,22 +129,15 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
-      //
-
       window.addEventListener('resize', onWindowResize, false);
-
-
     }
 
     function animate() {
-
       window.requestAnimationFrame(animate);
 
       controls.update();
       renderer.render(scene, camera);
       render();
-      console.log(camera.getWorldDirection());
-
     }
 
     function render() {
@@ -148,20 +145,18 @@
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       uniforms.time.value = 60. * elapsedSeconds;
 
+      console.log(camera.getWorldDirection());
       uniforms.dropPosition.value.x = camera.getWorldDirection().x;
       uniforms.dropPosition.value.y = camera.getWorldDirection().y;
       renderer.render(scene, camera);
     }
 
     function onWindowResize() {
-
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      // shader resolution update
-      
+      uniforms.resolution.value.x = window.innerWidth;
+      uniforms.resolution.value.y = window.innerHeight;
+      renderer.setSize(window.innerWidth, window.innerHeight);      
     }
   </script>
 
