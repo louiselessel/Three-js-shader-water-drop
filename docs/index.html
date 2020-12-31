@@ -33,21 +33,33 @@
       void main() {
         // center the shader
         vec2 st = gl_FragCoord.xy/resolution.xy - vec2(0.5);
+        vec3 color = vec3(0.5);
+
 
         // shader functionality
-        float x = mod(time + gl_FragCoord.x, 20.) < 10. ? 1. : 0.;
-        float y = mod(time + gl_FragCoord.y, 20.) < 10. ? 1. : 0.;
-        vec3 color = vec3(min(x, y));
+        //float x = mod(time + gl_FragCoord.x, 20.) < 10. ? 1. : 0.;
+        //float y = mod(time + gl_FragCoord.y, 20.) < 10. ? 1. : 0.;
+        //color = vec3(min(x, y));
+
 
         // color for position
-        if (st.x > dropPosition.x) {color = vec3(0,0,1);}
-        if (st.y > dropPosition.y) {color = vec3(1,0,0);}
+        //if (st.x > dropPosition.x) {color = vec3(0,0,1);}
+        //if (st.y > dropPosition.y) {color = vec3(1,0,0);}
 
         // color the frame we can see that it take up the whole screen.
         if (st.x > 0.99) {color = vec3(0,0,1);}
         if (st.x < 0.01) {color = vec3(1,0,0);}
         if (st.y > 0.99) {color = vec3(0,0,1);}
         if (st.y < 0.01) {color = vec3(1,0,0);}
+
+        // make cross
+        if (st.x > 0.45 && st.x < 0.55) {color = vec3(1,1,1);}
+        if (st.y > 0.45 && st.y < 0.55) {color = vec3(1,1,1);}
+
+        // make moving cross
+        if (st.x > dropPosition.x && st.x < dropPosition.x+0.1) {color = vec3(1,0,0);}
+        if (st.y > dropPosition.y && st.y < dropPosition.y+0.1) {color = vec3(0,1,0);}
+        //color = vec3(dropPosition.x);
 
         gl_FragColor = vec4(color, 1.);
     }
@@ -114,7 +126,7 @@
       uniforms.resolution.value.x = window.innerWidth;
       uniforms.resolution.value.y = window.innerHeight;
       uniforms.dropPosition.value.x = 0.5;
-      uniforms.dropPosition.value.xy = 0.5;
+      uniforms.dropPosition.value.y = 0.5;
       /* END SHADER STUFF */
 
 
