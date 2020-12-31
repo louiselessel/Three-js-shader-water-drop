@@ -54,7 +54,8 @@ var DeviceOrientationControls = function ( object ) {
 		return function ( quaternion, alpha, beta, gamma, orient ) {
 
 			euler.set( beta, alpha, - gamma, 'YXZ' ); // 'ZXY' for the device, but 'YXZ' for us
-			console.log("a: " + alpha);
+			console.log("a: ");
+			console.log(alpha);
 			quaternion.setFromEuler( euler ); // orient the device
 
 			quaternion.multiply( q1 ); // camera looks out the back of the device, not the top
