@@ -162,8 +162,10 @@
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       uniforms.time.value = 60. * elapsedSeconds;
       console.log(controls.object.rotation);
+      let camTarget;
   
-      console.log(camera.getWorldDirection().x);
+      camera.getWorldDirection(camTarget);
+      console.log(camTarget);
       //uniforms.dropPosition.value.x = camera.getWorldDirection().x;
       //uniforms.dropPosition.value.y = camera.getWorldDirection().y;
       //uniforms.dropPosition.value.y = camera.getWorldDirection().z;
