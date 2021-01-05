@@ -183,10 +183,10 @@
         var x = document.getElementById('Orientation_g').innerHTML;
         var y = document.getElementById('Orientation_b').innerHTML; 
         if (x != null && x < 90 && x > -90) {
-          uniforms.dropPosition.value.x = clamp_map(x, -90, 90, 0, 1.5);;
+          uniforms.dropPosition.value.x = clamp_map(x, -90, 90, 0, 1);;
         } 
         if (y != null && y < 90 && y > -90) {
-          uniforms.dropPosition.value.y = clamp_map(y, 90, -90, 0, 1.5);;
+          uniforms.dropPosition.value.y = clamp_map(y, 90, -90, 0, 1);;
         }
 
         // render static cam
