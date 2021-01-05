@@ -43,7 +43,8 @@
       precision mediump float;
       uniform float time;
       uniform vec2 resolution;
-      uniform vec3 dropPosition;
+      uniform vec2 dropPosition;
+
       void main()	{
           gl_Position = vec4(position, 1.0 );
           //gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -51,10 +52,45 @@
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
+      
+      precision mediump float;
+      
+      uniform vec2 resolution;
+      uniform vec2 dropPosition;
+      //vec2 dropPosition = vec2(0.5,0.0);
+      
+      const float threshold = 0.01;
+      float aRadius = 0.1;
+
+      vec3 test(vec2 uv) {
+        return vec3(uv.x, uv.y, 0.);
+      }
+
+      void main() {
+        vec2 st = (gl_FragCoord.xy /resolution.xy) *.5; // - vec2(0.5));
+        //float dist = distance(dropPosition.xy, gl_FragCoord.xy);
+        float dist = distance(dropPosition.xy, st.xy);
+          
+        vec3 color;
+
+        if (dist > aRadius) {
+          color = vec3(test(st));
+        }
+        else {
+          float d = dist / aRadius;
+          //color = vec3(dist);
+          color = mix(vec3(1.,1.,1.), vec3(0.0), step(1.0-threshold, d));
+        }
+        gl_FragColor = vec4(color, 1.0);
+      }
+      
+
+
+      /*
       precision mediump float;
       uniform vec2 resolution;
       uniform float time;
-      uniform vec3 dropPosition;
+      uniform vec2 dropPosition;
 
       // Draw a circle at vec2 `pos` with radius `rad` and color `color`.
       
@@ -111,13 +147,15 @@
         //vec4 drop = sphere(st, vec2(0.5,0.5), 0.0000000001, 0.0001, vec3(0,1,0));
         
         //vec4 drop = vec4(vec3( circle2( vec2(st.x - (1.-x), st.y - (1.-y)) ,.1) ) , 1.0);
-        vec4 drop = vec4( vec3( circle2( vec2(st.x-x/resolution.x, st.y), 0.1) ), 1.0);
+        vec4 drop = vec4( vec3( circle2( vec2(st.x-x, st.y), 0.1) ), 1.0);
         
         //color = vec4(test(st),1.);
         color = color + drop;
         
         gl_FragColor = color;
-    }
+        
+      }
+        */
 
    </script>
 
