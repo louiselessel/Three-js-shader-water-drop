@@ -52,29 +52,27 @@
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
-      
       precision mediump float;
-      
       uniform vec2 resolution;
+      uniform float time;
       uniform vec2 dropPosition;
       //vec2 dropPosition = vec2(0.5,0.0);
-      
       const float threshold = 0.01;
       float aRadius = 0.1;
 
-      vec3 test(vec2 uv) {
+      vec3 uvMap(vec2 uv) {
         return vec3(uv.x, uv.y, 0.);
       }
 
       void main() {
-        vec2 st = (gl_FragCoord.xy /resolution.xy) *.5; // - vec2(0.5));
+        vec2 st = (gl_FragCoord.xy /resolution.xy) *.5;    // - vec2(0.5));
         //float dist = distance(dropPosition.xy, gl_FragCoord.xy);
         float dist = distance(dropPosition.xy, st.xy);
           
         vec3 color;
 
         if (dist > aRadius) {
-          color = vec3(test(st));
+          color = vec3(uvMap(st));
         }
         else {
           float d = dist / aRadius;
@@ -83,80 +81,6 @@
         }
         gl_FragColor = vec4(color, 1.0);
       }
-      
-
-
-      /*
-      precision mediump float;
-      uniform vec2 resolution;
-      uniform float time;
-      uniform vec2 dropPosition;
-
-      // Draw a circle at vec2 `pos` with radius `rad` and color `color`.
-      
-      vec4 circle(vec2 uv, vec2 pos, float rad, vec3 color) {
-        float d = (length(pos - uv) - rad);
-        float t = clamp(d, 0.0, 1.0);
-        return vec4(color, 1.0 - t);
-      }
-      float circle2(in vec2 _st, in float _radius){
-        vec2 dist = _st-vec2(0.5);
-        return 1.-smoothstep(_radius-(_radius*0.01), _radius+(_radius*0.01), dot(dist,dist)*4.0);
-      }
-
-      vec4 sphere(vec2 uv, vec2 pos, float size, float intensity, vec3 color){
-        float ratio = (resolution.x/resolution.y); 
-        uv.x *= ratio;
-        pos.x *= ratio;
-        vec2 dist = (pos.xy-uv.xy) * size;
-        float flash = 1./dot(dist,dist);
-        vec4 newcolor = vec4(color * flash * intensity, 1.);
-        //vec4 newcolor = vec4(color * intensity, 1.);
-        return vec4(newcolor);
-      }
-      
-      vec3 test(vec2 uv) {
-        return vec3(uv.x, uv.y, 0.);
-      }
-
-      void main() {
-        // center the shader
-        vec2 st = (gl_FragCoord.xy /resolution.xy - vec2(0.5));
-        
-        vec4 color = vec4(0.5);
-        color.a = 1.0;
-
-        // color the frame so we can see that it takes up the whole screen.
-        if (st.x > 0.99) {color.rgb = vec3(0,0,1);}
-        if (st.x < 0.01) {color.rgb = vec3(1,0,0);}
-        if (st.y > 0.99) {color.rgb = vec3(0,0,1);}
-        if (st.y < 0.01) {color.rgb = vec3(1,0,0);}
-
-        // make cross
-        if (st.x > 0.45 && st.x < 0.55) {color.rgb = vec3(1,1,1);}
-        if (st.y > 0.45 && st.y < 0.55) {color.rgb = vec3(1,1,1);}
-        
-        // make moving cross
-        float x = dropPosition.x;
-        float y = dropPosition.y;
-        if (st.x > x-0.05 && st.x < x+0.05) {color.rgb = vec3(1,0,0);}
-        if (st.y > y-0.05 && st.y < y+0.05) {color.rgb = vec3(0,1,0);}
-
-
-        //vec4 drop = circle(st, vec2(0.5,0.5), 0.1, vec3(0,1,0) );
-        //vec4 drop = sphere(st, vec2(0.5,0.5), 0.0000000001, 0.0001, vec3(0,1,0));
-        
-        //vec4 drop = vec4(vec3( circle2( vec2(st.x - (1.-x), st.y - (1.-y)) ,.1) ) , 1.0);
-        vec4 drop = vec4( vec3( circle2( vec2(st.x-x, st.y), 0.1) ), 1.0);
-        
-        //color = vec4(test(st),1.);
-        color = color + drop;
-        
-        gl_FragColor = color;
-        
-      }
-        */
-
    </script>
 
     <script type="module">
@@ -220,19 +144,30 @@
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
         var y = document.getElementById('Orientation_b').innerHTML; 
-        if (x != null && x < 90 && x > -90) {
-          uniforms.dropPosition.value.x = clamp_map(x, -90, 90, 0, 1);;
+        var gyroVal = 60;
+        if (x != null && x < gyroVal && x > -gyroVal) {
+          var valx = clamp_map(x, -gyroVal, gyroVal, 0, 1);
+          uniforms.dropPosition.value.x = valx;
+          updateFieldIfNotNull('Mapped_X', valx);
         } 
-        if (y != null && y < 90 && y > -90) {
-          uniforms.dropPosition.value.y = clamp_map(y, 90, -90, 0, 1);;
+        if (y != null && y < gyroVal && y > -gyroVal) {
+          var valy = clamp_map(y, gyroVal, -gyroVal, 0, 1);
+          uniforms.dropPosition.value.y = valy;
+          updateFieldIfNotNull('Mapped_Y', valy);
         }
 
         // render static cam
         renderer.render(scene, camera);
       }
 
+
+      function updateFieldIfNotNull(fieldName, value, precision = 10) {
+        if (value != null)
+          document.getElementById(fieldName).innerHTML = value.toFixed(precision);
+      }
+
       function clamp_map(value, min1, max1, min2, max2) {
-        let newVal =0.;
+        let newVal = 0.;
         newVal = min2 + (value - min1) * (max2 - min2) / (max1 - min1);
         if (newVal < min2) {newVal = min2;}
         if (newVal > max2) {newVal = max2;}
@@ -256,6 +191,10 @@
         <li>X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span></li>
         <li>Y-axis (&gamma;): <span id="Orientation_g">0</span><span>&deg;</span></li>
         <li>Z-axis (&alpha;): <span id="Orientation_a">0</span><span>&deg;</span></li>
+        
+        <li>mapped X: <span id="Mapped_X">0</span></li>
+        <li>mapped Y: <span id="Mapped_Y">0</span></li>
+        
       </ul>
       <!--
       <h4>Accelerometer</h4>
