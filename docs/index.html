@@ -37,28 +37,36 @@
 
 <body>
   <main role="main" class="container">
+    <h1 align="left">Shader drop</h1>
 
-    <h1 align="left">Sensor access with shader cross</h1>
     <script id="vertexShader" type="x-shader/x-vertex">
-      precision mediump float;
+
+      varying vec2 vUv;
       uniform float time;
       uniform vec2 resolution;
       uniform vec2 dropPosition;
+      uniform sampler2D texture;
 
       void main()	{
-          gl_Position = vec4(position, 1.0 );
-          //gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        //gl_Position = vec4(position, 1.0 );
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
-      precision mediump float;
+
+      varying vec2 vUv;
+
       uniform vec2 resolution;
       uniform float time;
       uniform vec2 dropPosition;
       //vec2 dropPosition = vec2(0.5,0.0);
       const float threshold = 0.01;
       float aRadius = 0.1;
+
+      uniform sampler2D textureIn;
+
 
       vec3 uvMap(vec2 uv) {
         return vec3(uv.x, uv.y, 0.);
@@ -72,17 +80,21 @@
         vec3 color;
 
         if (dist > aRadius) {
-          color = vec3(uvMap(st));
+          //color = vec3(uvMap(st));
+          //color = vec3(uvMap(vUv));
+          color = vec3(0.0);
         }
         else {
           float d = dist / aRadius;
           //color = vec3(dist);
           color = mix(vec3(1.,1.,1.), vec3(0.0), step(1.0-threshold, d));
         }
+        //color = texture2D(textureIn, 0.5);
         gl_FragColor = vec4(color, 1.0);
       }
    </script>
 
+   <!-- THREE JS MODULE -->
     <script type="module">
       import * as THREE from './build/three.module.js'
       console.log("hello");
@@ -91,10 +103,13 @@
       var startTime;
       var uniforms, material, mesh;
       let camera;
+      //const textureIn = new THREE.TextureLoader().load( "./textures/Lorem_Ipsum_Univers55.png" );
+
       init();
       animate();
       startTime = Date.now();
 
+      
       function init() {
         /* SETUP */
         camera = new THREE.Camera();
@@ -105,8 +120,11 @@
         uniforms = {
           time: { type: "f", value: 1.0 },
           resolution: { type: "v2", value: new THREE.Vector2() },
-          dropPosition: { type: "v2", value: new THREE.Vector2() }
+          dropPosition: { type: "v2", value: new THREE.Vector2() },
+          textureIn: { type: "t", value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
         };
+
+        //uniforms[ "textureIn" ].value.wrapS = uniforms[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
         material = new THREE.ShaderMaterial({
           uniforms: uniforms,
