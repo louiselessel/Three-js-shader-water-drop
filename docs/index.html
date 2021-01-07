@@ -81,8 +81,9 @@
 
 
         if (dist > aRadius) {
-          //color = vec3(uvMap(st)); // check that mapping is correct
-          //color = vec3(uvMap(vUv)); // check that mapping is correct
+          //color = vec3(uvMap(st)); // debug that mapping is correct
+          //color = vec3(uvMap(vUv)); // debug that mapping is correct
+          //color = vec3(uvMap(dropPosition)); // debug color mapping
           //color = vec3(0.0);
           color = texture2D(textureIn, vUv).rgb;
         }
@@ -94,6 +95,7 @@
         
         gl_FragColor = vec4(color, 1.0);
       }
+
    </script>
 
    <!-- THREE JS MODULE -->
