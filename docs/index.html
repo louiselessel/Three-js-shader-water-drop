@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Shader drop</title>
+  <title> Shader drop demo </title>
   <style>
     #demo-div {
       color: lightgrey;
@@ -45,7 +45,7 @@
       uniform float time;
       uniform vec2 resolution;
       uniform vec2 dropPosition;
-      uniform sampler2D texture;
+      uniform sampler2D textureIn;
 
       void main()	{
         //gl_Position = vec4(position, 1.0 );
@@ -66,6 +66,7 @@
       float aRadius = 0.1;
 
       uniform sampler2D textureIn;
+      
 
 
       vec3 uvMap(vec2 uv) {
@@ -73,23 +74,24 @@
       }
 
       void main() {
-        vec2 st = (gl_FragCoord.xy /resolution.xy) *.5;    // - vec2(0.5));
-        //float dist = distance(dropPosition.xy, gl_FragCoord.xy);
+        vec2 st = (gl_FragCoord.xy /resolution.xy) *.5;
         float dist = distance(dropPosition.xy, st.xy);
           
         vec3 color;
 
+
         if (dist > aRadius) {
-          //color = vec3(uvMap(st));
-          //color = vec3(uvMap(vUv));
-          color = vec3(0.0);
+          //color = vec3(uvMap(st)); // check that mapping is correct
+          //color = vec3(uvMap(vUv)); // check that mapping is correct
+          //color = vec3(0.0);
+          color = texture2D(textureIn, vUv).rgb;
         }
         else {
           float d = dist / aRadius;
           //color = vec3(dist);
           color = mix(vec3(1.,1.,1.), vec3(0.0), step(1.0-threshold, d));
         }
-        //color = texture2D(textureIn, 0.5);
+        
         gl_FragColor = vec4(color, 1.0);
       }
    </script>
@@ -121,9 +123,10 @@
           time: { type: "f", value: 1.0 },
           resolution: { type: "v2", value: new THREE.Vector2() },
           dropPosition: { type: "v2", value: new THREE.Vector2() },
-          textureIn: { type: "t", value: new THREE.TextureLoader().load( 'textures/disturb.jpg' ) }
+          textureIn: { type: "t", value: new THREE.TextureLoader().load( 'textures/Lorem_Ipsum_Univers55.png' ) }
         };
 
+        
         //uniforms[ "textureIn" ].value.wrapS = uniforms[ "texture" ].value.wrapT = THREE.RepeatWrapping;
 
         material = new THREE.ShaderMaterial({
@@ -281,6 +284,8 @@
 
     let is_running = false;
     let demo_button = document.getElementById("start_demo");
+
+    // Button click will TO BE REMOVED
 
     demo_button.onclick = function (e) {
       e.preventDefault();
