@@ -66,10 +66,6 @@
       //float aRadius = 0.1;
 
       uniform sampler2D iChannel0;
-    
-      //const float threshold = 0.01;
-      //float aRadius = 0.1;
-      vec2 M;
       
       #define S(x, y, z)	smoothstep(x, y, z)
       #define TWOPI	6.283
@@ -81,10 +77,10 @@
 
       vec2 Drop(vec2 uv, float t) {
         t *= 4.;							// scale time
-        uv *= .50;						// scale of grid
-        uv += 0.1;
+        //uv *= .20;						// scale of grid
+        //uv += 0.1;
 
-        vec2 a = vec2 (2.,1.);			// aspect of grid cell
+        vec2 a = vec2 (1.,1.);			// aspect of grid cell
         //a = vec2(iResolution.x/iResolution.y); // aspect of grid cell based on image
         
         // st used for main drop - uv used for additional drops
@@ -102,10 +98,10 @@
         //st.y += t*0.22;						// move the grid to fit the drop fall
 
         // we messed with the offset, so redo the grid id
-        id = floor(st);
+        //id = floor(st);
         
         // center drop in grid
-        st = fract(st) - 0.5; 				// move drop in center of a grid
+        //st = fract(st) - 0.5; 				// move drop in center of a grid
         
         // offset timing of drops
         //t+= fract( sin(id.x*71.2 + id.y*1453) *768.9) *TWOPI; 	// * TWOPI to get complete phase shift
@@ -167,18 +163,18 @@
 
       void main()
       {
-          vec2 uv = (gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
+          vec2 uv = (gl_FragCoord.xy/iResolution.xy)*0.5 -0.5;
+          //(gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
           vec2 UV = gl_FragCoord.xy/iResolution.xy * 0.5;
           
           //FROM ORIGINAL: vec2 st = (gl_FragCoord.xy /resolution.xy) *.5;
           
-          M = dropPosition.xy; ///iResolution.xy;
-          
+          //M = dropPosition.xy; ///iResolution.xy;
+          //dropPosition.xy = M.xy;
+
           // Time
           float T = iTime; // + M.x*2.;
           float t = T*.2;
-
-          //vec4 f = textureLod(iChannel0, UV, 0.); 		// render background - number is blurring
 
         // Make drops with UVs
           vec2 dropDistort = Drop(uv, T);
@@ -203,7 +199,9 @@
           
           //vec4 col = f;
           //col = vec4(dropDistort, 0, 1.);
-          //col += vec4(dropDistort, 0, 1.);
+          col += vec4(dropDistort, 0, 1.);
+          
+          //if (uv.y > 0.49) {col = vec4(1.0,0.0,0.0,1.0);}   // check that mapping of uv is -0.5 to 0.5
           
           //f = texture(iChannel0, (u - v1.xy) * .3);
           //fragColor = col;  
@@ -232,11 +230,11 @@
       function onMouseMove( event ) {
 
         // calculate mouse position in normalized device coordinates
-        // (-1 to +1) for both components
+        // (-0.5 to +0.5) for both components
 
-        iMouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        iMouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-        //console.log(iMouse);
+        iMouse.x = ( event.clientX / window.innerWidth ) - 0.5;
+        iMouse.y = (( event.clientY / window.innerHeight ) - 0.5) * -1.;
+        console.log(iMouse.y);
       }
 
       function init() {
@@ -295,12 +293,12 @@
         var y = document.getElementById('Orientation_b').innerHTML;
         var gyroVal = 60;
         if (x != null && x < gyroVal && x > -gyroVal) {
-          var valx = clamp_map(x, -gyroVal, gyroVal, 0, 1);
+          var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           uniforms.dropPosition.value.x = valx;
           updateFieldIfNotNull('Mapped_X', valx);
         }
         if (y != null && y < gyroVal && y > -gyroVal) {
-          var valy = clamp_map(y, gyroVal, -gyroVal, 0, 1);
+          var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
           uniforms.dropPosition.value.y = valy;
           updateFieldIfNotNull('Mapped_Y', valy);
         }
