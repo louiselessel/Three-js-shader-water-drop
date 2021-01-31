@@ -220,6 +220,7 @@
       let camera;
       //const textureIn = new THREE.TextureLoader().load( "./textures/Lorem_Ipsum_Univers55.png" );
       const iMouse = new THREE.Vector2();
+      const dropPos = new THREE.Vector2();
       
       init();
       animate();
@@ -233,8 +234,49 @@
 
         iMouse.x = ( event.clientX / window.innerWidth ) - 0.5;
         iMouse.y = (( event.clientY / window.innerHeight ) - 0.5) * -1.;
-        console.log(iMouse.y);
+        //console.log(iMouse.y);
+        updateFieldIfNotNull('Mouse_X', iMouse.x);
+        updateFieldIfNotNull('Mouse_Y', iMouse.y);
       }
+
+      function applyForce(force, mass) {
+        var f = force.divideScalar(mass); //Receive a force, divide by mass, and add to acceleration.
+        console.log(f);
+        return f;
+      }
+
+      function calcForces(posX,posY, forceX, forceY) {
+        //var newVal = new THREE.Vector2( 0, 0 );
+
+        var mass = 1.;
+        var location = new THREE.Vector2(posX,posY);
+        var velocity = new THREE.Vector2(0,0);
+        var acceleration = new THREE.Vector2(0,0);
+        //console.log(mass);
+
+        //var gravity = THREE.Vector2(0,0.1); // force example
+        var force = new THREE.Vector2(forceX,forceY); // force
+        //console.log(force);
+        // apply force
+        //movers[i].applyForce(gravity);
+        var f = applyForce(force, mass);
+        acceleration.add(f);
+        console.log(acceleration);
+
+        // update location
+        velocity.add(acceleration);
+        location.add(velocity);
+
+        //console.log(velocity);
+        console.log('l');
+        console.log(location);
+        acceleration.multiply(0);
+
+        //console.log(location);
+        return location;
+      }
+
+
 
       function init() {
         /* SETUP */
@@ -264,8 +306,8 @@
 
         uniforms.iResolution.value.x = window.innerWidth;
         uniforms.iResolution.value.y = window.innerHeight;
-        uniforms.dropPosition.value.x = 0.5;
-        uniforms.dropPosition.value.y = 0.5;
+        uniforms.dropPosition.value.x = 0.0;
+        uniforms.dropPosition.value.y = 0.0;
         /* END SHADER STUFF */
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -293,23 +335,40 @@
         var gyroVal = 60;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
-          uniforms.dropPosition.value.x = valx;
+          dropPos.x = valx;
+          //uniforms.dropPosition.value.x = valx;
           updateFieldIfNotNull('Mapped_X', valx);
         }
         if (y != null && y < gyroVal && y > -gyroVal) {
           var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
-          uniforms.dropPosition.value.y = valy;
+          dropPos.y = valy;
+          //uniforms.dropPosition.value.y = valy;
           updateFieldIfNotNull('Mapped_Y', valy);
         }
+
+        dropPos.x = iMouse.x;
+        dropPos.y = iMouse.y;
+        //uniforms.dropPosition.value.x = dropPos.x; 
+        //uniforms.dropPosition.value.y = dropPos.y; 
 
         // debug with mouse
         //uniforms.dropPosition.value.y = iMouse.y;
         //uniforms.dropPosition.value.x = iMouse.x;
 
+        var newPos = new THREE.Vector2(0,0);
+        newPos = calcForces(dropPos.x,dropPos.y, 0.00, 0.0);
+        //console.log(newPos);
+
+        uniforms.dropPosition.value.x = newPos.x; 
+        uniforms.dropPosition.value.y = newPos.y; 
+
+
+
 
         // render static cam
         renderer.render(scene, camera);
       }
+
 
 
 
@@ -346,9 +405,11 @@
 
         <li>mapped X: <span id="Mapped_X">0</span></li>
         <li>mapped Y: <span id="Mapped_Y">0</span></li>
+        <li>mouseX: <span id="Mouse_X">0</span></li>
+        <li>mouseY: <span id="Mouse_Y">0</span></li>
 
       </ul>
-      <!--
+      
       <h4>Accelerometer</h4>
       <ul>
         <li>X-axis: <span id="Accelerometer_x">0</span><span> m/s<sup>2</sup></span></li>
@@ -370,7 +431,7 @@
         <li>Y-axis: <span id="Gyroscope_y">0</span><span>&deg;/s</span></li>
         <li>Z-axis: <span id="Gyroscope_z">0</span><span>&deg;/s</span></li>
       </ul>
-      -->
+      
     </div>
   </main>
 
