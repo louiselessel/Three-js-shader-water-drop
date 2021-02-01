@@ -221,6 +221,13 @@
       //const textureIn = new THREE.TextureLoader().load( "./textures/Lorem_Ipsum_Univers55.png" );
       const iMouse = new THREE.Vector2();
       const dropPos = new THREE.Vector2();
+      const last_dropPos = new THREE.Vector2();
+      var maxforce = 4; // float
+      var maxspeed = 0.1; // float
+      var mass = 0.001;
+      var location = new THREE.Vector2(0,0);
+      var acceleration = new THREE.Vector2(0,0);
+      var velocity = new THREE.Vector2(0,0);
       
       init();
       animate();
@@ -239,40 +246,90 @@
         updateFieldIfNotNull('Mouse_Y', iMouse.y);
       }
 
-      function applyForce(force, mass) {
-        var f = force.divideScalar(mass); //Receive a force, divide by mass, and add to acceleration.
-        console.log(f);
-        return f;
+      function applyForce(force) {
+        var f = new THREE.Vector2(0,0);
+        f = force.divideScalar(mass); //Receive a force, divide by mass, and add to acceleration.
+        acceleration.add(f);
+        //return f;
       }
 
+      function seek(target) {
+        var desired = new THREE.Vector2(0,0);
+        // console.log('location_seek');
+        // console.log(location.x);
+        desired = target.sub(location);
+        //desired.subVectors(target,location);
+        //desired = target.distanceTo(location);
+        //console.log('desired.x');
+        //console.log(desired.x);
+        desired.normalize();
+        //console.log(desired.x);
+        desired.multiplyScalar(maxspeed);
+        //console.log(desired.x);
+        var steer = new THREE.Vector2(0,0);
+        steer = desired.sub(velocity);
+        // console.log('steer.x');
+        // console.log(steer.x);
+        // console.log(velocity);
+        steer.clampLength ( 0, maxforce);
+        //console.log('steer.x');
+        //console.log(steer.x);
+        applyForce(steer);
+      }
+
+      /*
+      function arrive(PVector target) {
+        PVector desired = PVector.sub(target,location);
+        float d = desired.mag(); //The distance is the magnitude of the vector pointing from location to target.
+        desired.normalize();
+        //If we are closer than 100 pixels...
+        if (d < 100) {
+          //...set the magnitude according to how close we are.
+          float m = map(d,0,100,0,maxspeed);
+          desired.mult(m);
+        } else {
+          //Otherwise, proceed at maximum speed.
+          desired.mult(maxspeed);
+        }
+    
+        //The usual steering = desired - velocity
+        PVector steer = PVector.sub(desired,velocity);
+        steer.limit(maxforce);
+        applyForce(steer);
+      }
+      */
+
+      // FRICTION
+
       function calcForces(posX,posY, forceX, forceY) {
-        //var newVal = new THREE.Vector2( 0, 0 );
-
-        var mass = 1.;
-        var location = new THREE.Vector2(posX,posY);
-        var velocity = new THREE.Vector2(0,0);
-        var acceleration = new THREE.Vector2(0,0);
-        //console.log(mass);
-
+        // additional forces
         //var gravity = THREE.Vector2(0,0.1); // force example
         var force = new THREE.Vector2(forceX,forceY); // force
+        //var f = applyForce(force);
         //console.log(force);
-        // apply force
-        //movers[i].applyForce(gravity);
-        var f = applyForce(force, mass);
-        acceleration.add(f);
-        console.log(acceleration);
 
+        // seek target
+        var target = new THREE.Vector2( posX, posY );
+        //console.log('target');
+        //console.log(target);
+        seek(target);
+
+        var test = new THREE.Vector2(1.,1);
         // update location
+        //velocity.add(test);
         velocity.add(acceleration);
+
+        velocity.clampLength ( 0, maxspeed);
+        // console.log('velo');
+        // console.log(velocity);
         location.add(velocity);
 
         //console.log(velocity);
-        console.log('l');
-        console.log(location);
-        acceleration.multiply(0);
-
-        //console.log(location);
+        // console.log('l');
+        // console.log(location);
+        acceleration.multiplyScalar(0); //zero out acceleration
+        //console.log('acc ZERO');
+        //console.log(acceleration);
         return location;
       }
 
@@ -283,6 +340,11 @@
         camera = new THREE.Camera();
         camera.position.z = 1.;
         scene = new THREE.Scene();
+        location = new THREE.Vector2(0,0);
+        console.log('location_init');
+        console.log(location.x);
+        acceleration = new THREE.Vector2(0,0);
+        velocity = new THREE.Vector2(0,0);
 
         /* SHADER STUFF */
         uniforms = {
@@ -329,9 +391,14 @@
         var elapsedSeconds = elapsedMilliseconds / 1000.;
         uniforms.iTime.value = 60. * elapsedSeconds;
 
+        last_dropPos.x = dropPos.x;
+        last_dropPos.y = dropPos.y;
+
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
         var y = document.getElementById('Orientation_b').innerHTML;
+        var xAccel = document.getElementById('Accelerometer_x').innerHTML;
+        var yAccel = document.getElementById('Accelerometer_y').innerHTML;
         var gyroVal = 60;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
@@ -346,8 +413,16 @@
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
-        dropPos.x = iMouse.x;
-        dropPos.y = iMouse.y;
+        //dropPos.x = iMouse.x;
+        //dropPos.y = iMouse.y;
+        //console.log(dropPos.x);
+        //console.log('loc');
+        //console.log(location.x);
+
+        //var scalarVec = new THREE.Vector2(0,0);
+        //scalarVec = dropPos.distanceTo(last_dropPos);
+        //console.log(scalarVec);
+
         //uniforms.dropPosition.value.x = dropPos.x; 
         //uniforms.dropPosition.value.y = dropPos.y; 
 
@@ -355,12 +430,18 @@
         //uniforms.dropPosition.value.y = iMouse.y;
         //uniforms.dropPosition.value.x = iMouse.x;
 
-        var newPos = new THREE.Vector2(0,0);
-        newPos = calcForces(dropPos.x,dropPos.y, 0.00, 0.0);
-        //console.log(newPos);
 
-        uniforms.dropPosition.value.x = newPos.x; 
-        uniforms.dropPosition.value.y = newPos.y; 
+        // var newPos = new THREE.Vector2(0,0);
+        // newPos = calcForces(dropPos.x,dropPos.y, 1.0, 1.0);  // target position
+        // console.log('newPos');
+        // console.log(newPos);
+
+        //uniforms.dropPosition.value.x = newPos.x; 
+        //uniforms.dropPosition.value.y = newPos.y; 
+
+        
+        uniforms.dropPosition.value.x = dropPos.x; 
+        uniforms.dropPosition.value.y = dropPos.y; 
 
 
 
@@ -465,7 +546,7 @@
       updateFieldIfNotNull('Accelerometer_y', event.acceleration.y);
       updateFieldIfNotNull('Accelerometer_z', event.acceleration.z);
 
-      updateFieldIfNotNull('Accelerometer_i', event.interval, 2);
+      updateFieldIfNotNull('Accelerometer_i', event.interval, 500); //millis
 
       updateFieldIfNotNull('Gyroscope_z', event.rotationRate.alpha);
       updateFieldIfNotNull('Gyroscope_x', event.rotationRate.beta);
