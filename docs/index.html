@@ -30,7 +30,39 @@
     }
 
     #demo-div ul {
-      margin-bottom: 0.0rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .container {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      /*border: 5px solid red;*/
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    button {
+      z-index: 265;
+      display: grid;
+      justify-content: center;
+      /*padding: 0.35em 1.2em;*/
+      border: 0.05em solid #FFFFFF;
+      margin: auto;
+      /*margin: 0 0.5em 0.5em 0;*/
+      /*border-radius: 0.12em;*/
+      /*box-sizing: border-box;*/
+      /*text-decoration: none;*/
+      font-family: 'Roboto', sans-serif;
+      font-weight: 200;
+      font-size: x-large;
+      color: #FFFFFF;
+      text-align: center;
+      background-color: transparent;
+      /*transition: all 0.2s;*/
+      padding: 10%;
+      border-radius: 50%;
     }
   </style>
 </head>
@@ -194,36 +226,36 @@
       var maxforce = 4; // float
       var maxspeed = 0.1; // float
       var mass = 0.001;
-      var location = new THREE.Vector2(0,0);
-      var acceleration = new THREE.Vector2(0,0);
-      var velocity = new THREE.Vector2(0,0);
-      
+      var location = new THREE.Vector2(0, 0);
+      var acceleration = new THREE.Vector2(0, 0);
+      var velocity = new THREE.Vector2(0, 0);
+
       init();
       animate();
       startTime = Date.now();
 
 
-      function onMouseMove( event ) {
+      function onMouseMove(event) {
 
         // calculate mouse position in normalized device coordinates
         // (-0.5 to +0.5) for both components
 
-        iMouse.x = ( event.clientX / window.innerWidth ) - 0.5;
-        iMouse.y = (( event.clientY / window.innerHeight ) - 0.5) * -1.;
+        iMouse.x = (event.clientX / window.innerWidth) - 0.5;
+        iMouse.y = ((event.clientY / window.innerHeight) - 0.5) * -1.;
         //console.log(iMouse.y);
         updateFieldIfNotNull('Mouse_X', iMouse.x);
         updateFieldIfNotNull('Mouse_Y', iMouse.y);
       }
 
       function applyForce(force) {
-        var f = new THREE.Vector2(0,0);
+        var f = new THREE.Vector2(0, 0);
         f = force.divideScalar(mass); //Receive a force, divide by mass, and add to acceleration.
         acceleration.add(f);
         //return f;
       }
 
       function seek(target) {
-        var desired = new THREE.Vector2(0,0);
+        var desired = new THREE.Vector2(0, 0);
         // console.log('location_seek');
         // console.log(location.x);
         desired = target.sub(location);
@@ -235,12 +267,12 @@
         //console.log(desired.x);
         desired.multiplyScalar(maxspeed);
         //console.log(desired.x);
-        var steer = new THREE.Vector2(0,0);
+        var steer = new THREE.Vector2(0, 0);
         steer = desired.sub(velocity);
         // console.log('steer.x');
         // console.log(steer.x);
         // console.log(velocity);
-        steer.clampLength ( 0, maxforce);
+        steer.clampLength(0, maxforce);
         //console.log('steer.x');
         //console.log(steer.x);
         applyForce(steer);
@@ -270,25 +302,25 @@
 
       // FRICTION UNDER IMPLEMENTATION
 
-      function calcForces(posX,posY, forceX, forceY) {
+      function calcForces(posX, posY, forceX, forceY) {
         // additional forces
         //var gravity = THREE.Vector2(0,0.1); // force example
-        var force = new THREE.Vector2(forceX,forceY); // force
+        var force = new THREE.Vector2(forceX, forceY); // force
         //var f = applyForce(force);
         //console.log(force);
 
         // seek target
-        var target = new THREE.Vector2( posX, posY );
+        var target = new THREE.Vector2(posX, posY);
         //console.log('target');
         //console.log(target);
         seek(target);
 
-        var test = new THREE.Vector2(1.,1);
+        var test = new THREE.Vector2(1., 1);
         // update location
         //velocity.add(test);
         velocity.add(acceleration);
 
-        velocity.clampLength ( 0, maxspeed);
+        velocity.clampLength(0, maxspeed);
         // console.log('velo');
         // console.log(velocity);
         location.add(velocity);
@@ -309,11 +341,11 @@
         camera = new THREE.Camera();
         camera.position.z = 1.;
         scene = new THREE.Scene();
-        location = new THREE.Vector2(0,0);
+        location = new THREE.Vector2(0, 0);
         console.log('location_init');
         console.log(location.x);
-        acceleration = new THREE.Vector2(0,0);
-        velocity = new THREE.Vector2(0,0);
+        acceleration = new THREE.Vector2(0, 0);
+        velocity = new THREE.Vector2(0, 0);
 
         /* SHADER STUFF */
         uniforms = {
@@ -347,7 +379,7 @@
         document.body.appendChild(renderer.domElement);
 
         window.addEventListener('resize', onWindowResize, false);
-        window.addEventListener( 'mousemove', onMouseMove, false );
+        window.addEventListener('mousemove', onMouseMove, false);
       }
 
       function animate() {
@@ -403,8 +435,8 @@
         //uniforms.dropPosition.value.y = newPos.y; 
 
 
-        uniforms.dropPosition.value.x = dropPos.x; 
-        uniforms.dropPosition.value.y = dropPos.y; 
+        uniforms.dropPosition.value.x = dropPos.x;
+        uniforms.dropPosition.value.y = dropPos.y;
 
 
 
@@ -437,12 +469,14 @@
       }
     </script>
 
-    <div class="p-3 mb-2 bg-secondary" id="demo-div">
-      <a  id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
-      <p hidden style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
+    <button id="mybutton">Start</button>
+
+    <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
+      <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
+      <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
 
-      <ul hidden> 
+      <ul>
         <li>X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span></li>
         <li>Y-axis (&gamma;): <span id="Orientation_g">0</span><span>&deg;</span></li>
         <li>Z-axis (&alpha;): <span id="Orientation_a">0</span><span>&deg;</span></li>
@@ -453,29 +487,29 @@
         <li>mouseY: <span id="Mouse_Y">0</span></li>
 
       </ul>
-      
-      <h4 hidden>Accelerometer</h4>
-      <ul hidden>
+
+      <h4>Accelerometer</h4>
+      <ul>
         <li>X-axis: <span id="Accelerometer_x">0</span><span> m/s<sup>2</sup></span></li>
         <li>Y-axis: <span id="Accelerometer_y">0</span><span> m/s<sup>2</sup></span></li>
         <li>Z-axis: <span id="Accelerometer_z">0</span><span> m/s<sup>2</sup></span></li>
         <li>Data Interval: <span id="Accelerometer_i">0</span><span> ms</span></li>
       </ul>
 
-      <h4 hidden>Accelerometer including gravity</h4>
-      <ul hidden>
+      <h4>Accelerometer including gravity</h4>
+      <ul>
         <li>X-axis: <span id="Accelerometer_gx">0</span><span> m/s<sup>2</sup></span></li>
         <li>Y-axis: <span id="Accelerometer_gy">0</span><span> m/s<sup>2</sup></span></li>
         <li>Z-axis: <span id="Accelerometer_gz">0</span><span> m/s<sup>2</sup></span></li>
       </ul>
 
-      <h4 hidden>Gyroscope</h4>
-      <ul hidden>
+      <h4>Gyroscope</h4>
+      <ul>
         <li>X-axis: <span id="Gyroscope_x">0</span><span>&deg;/s</span></li>
         <li>Y-axis: <span id="Gyroscope_y">0</span><span>&deg;/s</span></li>
         <li>Z-axis: <span id="Gyroscope_z">0</span><span>&deg;/s</span></li>
       </ul>
-      
+
     </div>
   </main>
 
@@ -519,7 +553,7 @@
 
 
     let is_running = false;
-    let demo_button = document.getElementById("start_demo");
+    let demo_button = document.getElementById("mybutton");
 
     // Button click will TO BE REMOVED
     /*
@@ -564,14 +598,16 @@
       if (is_running) {
         window.removeEventListener("devicemotion", handleMotion);
         window.removeEventListener("deviceorientation", handleOrientation);
-        demo_button.innerHTML = "Start demo";
+        //demo_button.innerHTML = "Start demo";
+        //demo_button.innerHTML = "Start demo";
         demo_button.classList.add('btn-success');
         demo_button.classList.remove('btn-danger');
         is_running = false;
       } else {
         window.addEventListener("devicemotion", handleMotion);
         window.addEventListener("deviceorientation", handleOrientation);
-        document.getElementById("start_demo").innerHTML = "Stop demo";
+        demo_button.style.display = "none";
+       //document.getElementById("start_demo").innerHTML = "Stop demo";
         demo_button.classList.remove('btn-success');
         demo_button.classList.add('btn-danger');
         is_running = true;
