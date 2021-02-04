@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title> Shader drop demo </title>
+  <title hidden> Julius Bär </title>
   <style>
     #demo-div {
       color: lightgrey;
@@ -37,7 +37,7 @@
 
 <body>
   <main role="main" class="container">
-    <h1 align="left">Shader drop demo</h1>
+    <h1 hidden align="left">Julius Bär</h1>
 
     <script id="vertexShader" type="x-shader/x-vertex">
 
@@ -55,15 +55,12 @@
     </script>
 
     <script id="fragmentShader" type="x-shader/x-fragment">
-
       varying vec2 vUv;
 
       uniform vec2 iResolution;
       uniform float iTime;
       uniform vec2 dropPosition;
       //vec2 dropPosition = vec2(0.5,0.5);
-      //const float threshold = 0.01;
-      //float aRadius = 0.1;
 
       uniform sampler2D iChannel0;
       
@@ -77,11 +74,9 @@
 
       vec2 Drop(vec2 uv, float t) {
         t *= 4.;							// scale time
-        //uv *= .20;						// scale of grid
-        //uv += 0.1;
-
-        vec2 a = vec2 (1.,1.);			// aspect of grid cell
-        //a = vec2(iResolution.x/iResolution.y); // aspect of grid cell based on image
+        
+        vec2 a = vec2 (1.,1);			// aspect of grid cell
+        a = vec2(iResolution.x/iResolution.y); // aspect of grid cell based on image
         
         // st used for main drop - uv used for additional drops
         vec2 st = uv*a;					// uv to aspect
@@ -89,30 +84,9 @@
         // grid cell id's
         vec2 id = floor(st);
         
-        // offset grid to look more random
-        float noise = random(id.x, 716.34, 768.34);
-        //st.y += noise;					// offset main drop
-        //uv.y += noise;					// offset trail drops
-        
-        // make the grid move with time
-        //st.y += t*0.22;						// move the grid to fit the drop fall
-
-        // we messed with the offset, so redo the grid id
-        //id = floor(st);
-        
-        // center drop in grid
-        //st = fract(st) - 0.5; 				// move drop in center of a grid
-        
-        // offset timing of drops
-        //t+= fract( sin(id.x*71.2 + id.y*1453) *768.9) *TWOPI; 	// * TWOPI to get complete phase shift
-        
         // position of drop
         float y = 0.0;
         float x = 0.0;								// x location in grid
-
-        //y = -sin(t+sin(t+sin(t)*0.5)) * 0.43;	// move up slow fast down -  a curve
-        //x = 0.5-0.5; 
-        //y = 0.5-0.5; 
         
         x = dropPosition.x;           // from external
         y = dropPosition.y;
@@ -123,29 +97,11 @@
         float d = length(offset1);				// distance to center of box
         float mask1 = S(.02, .1, d);			// mask to make fuzzy or not
         
-        // make more circles
-        vec2 offset2 = (fract(uv*a.x*vec2(1.,2.)) -.5) / vec2(1.,2.);
-        d = length(uv);					// circle in center of image
-        d = length(fract(uv*a.x) -.5);	// smaller circles in each grid
-        d = length(fract(uv*a.x*vec2(1.,2.)) -.5);		// squeze them in y (make twice the amount) 
-        d = length((fract(uv*a.x*vec2(1.,2.)) -.5)/ vec2(1.,2.));		// make round again
-        d = length(offset2);
-        
-        
-        float maskDropDirection = S(-.1,.1, st.y-p1.y);		// mask for drops above the current p1
-        float mask2 = S(.07, .06, d);
-        mask2 = S(.2*(.5-st.y), .0, d);	// fuzzy, distance applied
-        mask2 *= maskDropDirection;		// mask applied on drops
-        
-        //if (st.x > .48|| st.y > 0.49 ) { mask1 = 1.;}		// show grid
-        
         // strength, makes uv mask scaled + makes ofsett different for each pixel
         float sm1 = 30.;
-        float sm2 = 20.;
         
         // make drops
         vec2 drops = vec2(mask1*offset1*sm1);	
-        //drops += vec2(mask2*offset2*sm2);
         
         return vec2(drops);
       }
@@ -188,13 +144,26 @@
           float cx = DropReflection(dropDistort1, layer1, 0., 0.).x;
           float cy = DropReflection(dropDistort2, layer1, 0., 0.).x;
 
+          // n IS THE DROP
           //float cx = Drops(uv+e, t, staticDrops, layer1, layer2).x;
           //float cy = Drops(uv+e.yx, t, staticDrops, layer1, layer2).x;
           vec2 n = vec2(cx-c.x, cy-c.x);		// expensive normals
           
-          vec4 col = texture2D(iChannel0, vUv+n); //  textureLod(iChannel0, UV+n, 1.);
-          //color = texture2D(iChannel0, vUv).rgb;
-          
+
+          float rainAmount = 0.3;				// also adjusts the amount of blur -  min= 0.3
+    
+          // MAKE THE BLUR
+          float maxBlur = mix(3., 6., rainAmount);
+          float minBlur = 1.;
+          // APPLY THE BLUR
+          float focus = mix((maxBlur-c.y)*0.5*0.5, minBlur, S(.1, .2, c.y));
+          //focus = mix((maxBlur-c.y)*0.5*0.5, minBlur, S(.1, .2, c.y-0.5));
+          //focus = mix((maxBlur-c.x)*0.5*0.5, minBlur, S(.1, .2, c.x-0.5));
+          //focus = mix((maxBlur-c.x)*0.5*0.5, focus, S(.1, .2, c.x-0.5));
+          focus *= 0.5;
+    
+          // drop + blur
+          vec4 col = texture2D(iChannel0, vUv+n, focus); 
           
           //vec4 col = f;
           //col = vec4(dropDistort, 0, 1.);
@@ -299,7 +268,7 @@
       }
       */
 
-      // FRICTION
+      // FRICTION UNDER IMPLEMENTATION
 
       function calcForces(posX,posY, forceX, forceY) {
         // additional forces
@@ -403,16 +372,15 @@
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           dropPos.x = valx;
-          //uniforms.dropPosition.value.x = valx;
           updateFieldIfNotNull('Mapped_X', valx);
         }
         if (y != null && y < gyroVal && y > -gyroVal) {
           var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
           dropPos.y = valy;
-          //uniforms.dropPosition.value.y = valy;
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
+        // MOUSE DEBUG
         //dropPos.x = iMouse.x;
         //dropPos.y = iMouse.y;
         //console.log(dropPos.x);
@@ -426,11 +394,6 @@
         //uniforms.dropPosition.value.x = dropPos.x; 
         //uniforms.dropPosition.value.y = dropPos.y; 
 
-        // debug with mouse
-        //uniforms.dropPosition.value.y = iMouse.y;
-        //uniforms.dropPosition.value.x = iMouse.x;
-
-
         // var newPos = new THREE.Vector2(0,0);
         // newPos = calcForces(dropPos.x,dropPos.y, 1.0, 1.0);  // target position
         // console.log('newPos');
@@ -439,7 +402,7 @@
         //uniforms.dropPosition.value.x = newPos.x; 
         //uniforms.dropPosition.value.y = newPos.y; 
 
-        
+
         uniforms.dropPosition.value.x = dropPos.x; 
         uniforms.dropPosition.value.y = dropPos.y; 
 
@@ -475,11 +438,11 @@
     </script>
 
     <div class="p-3 mb-2 bg-secondary" id="demo-div">
-      <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
-      <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
+      <a hidden id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
+      <p hidden style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
 
-      <ul>
+      <ul hidden> 
         <li>X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span></li>
         <li>Y-axis (&gamma;): <span id="Orientation_g">0</span><span>&deg;</span></li>
         <li>Z-axis (&alpha;): <span id="Orientation_a">0</span><span>&deg;</span></li>
@@ -491,23 +454,23 @@
 
       </ul>
       
-      <h4>Accelerometer</h4>
-      <ul>
+      <h4 hidden>Accelerometer</h4>
+      <ul hidden>
         <li>X-axis: <span id="Accelerometer_x">0</span><span> m/s<sup>2</sup></span></li>
         <li>Y-axis: <span id="Accelerometer_y">0</span><span> m/s<sup>2</sup></span></li>
         <li>Z-axis: <span id="Accelerometer_z">0</span><span> m/s<sup>2</sup></span></li>
         <li>Data Interval: <span id="Accelerometer_i">0</span><span> ms</span></li>
       </ul>
 
-      <h4>Accelerometer including gravity</h4>
-      <ul>
+      <h4 hidden>Accelerometer including gravity</h4>
+      <ul hidden>
         <li>X-axis: <span id="Accelerometer_gx">0</span><span> m/s<sup>2</sup></span></li>
         <li>Y-axis: <span id="Accelerometer_gy">0</span><span> m/s<sup>2</sup></span></li>
         <li>Z-axis: <span id="Accelerometer_gz">0</span><span> m/s<sup>2</sup></span></li>
       </ul>
 
-      <h4>Gyroscope</h4>
-      <ul>
+      <h4 hidden>Gyroscope</h4>
+      <ul hidden>
         <li>X-axis: <span id="Gyroscope_x">0</span><span>&deg;/s</span></li>
         <li>Y-axis: <span id="Gyroscope_y">0</span><span>&deg;/s</span></li>
         <li>Z-axis: <span id="Gyroscope_z">0</span><span>&deg;/s</span></li>
@@ -559,9 +522,35 @@
     let demo_button = document.getElementById("start_demo");
 
     // Button click will TO BE REMOVED
+    window.onload = function (e) {
+      e.preventDefault();
+      // Request permission for iOS 13+ devices
+      if (
+        DeviceMotionEvent &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+      ) {
+        DeviceMotionEvent.requestPermission();
+      }
+
+      if (is_running) {
+        window.removeEventListener("devicemotion", handleMotion);
+        window.removeEventListener("deviceorientation", handleOrientation);
+        demo_button.innerHTML = "Start demo";
+        demo_button.classList.add('btn-success');
+        demo_button.classList.remove('btn-danger');
+        is_running = false;
+      } else {
+        window.addEventListener("devicemotion", handleMotion);
+        window.addEventListener("deviceorientation", handleOrientation);
+        document.getElementById("start_demo").innerHTML = "Stop demo";
+        demo_button.classList.remove('btn-success');
+        demo_button.classList.add('btn-danger');
+        is_running = true;
+      }
+    };
 
     demo_button.onclick = function (e) {
-      e.preventDefault();
+      //e.preventDefault();
       // Request permission for iOS 13+ devices
       if (
         DeviceMotionEvent &&
