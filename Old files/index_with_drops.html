@@ -90,220 +90,216 @@
       varying vec2 vUv;
 
       uniform vec2 iResolution;
-      uniform vec3 iMouse;
       uniform float iTime;
       uniform vec2 dropPosition;
       //vec2 dropPosition = vec2(0.5,0.5);
 
       uniform sampler2D iChannel0;
       
-      // Based on
-// Heartfelt - by Martijn Steinrucken aka BigWings - 2017
-// Email:countfrolic@gmail.com Twitter:@The_ArtOfCode
-// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+      #define S(x, y, z)	smoothstep(x, y, z)
+      #define TWOPI	6.283
 
-// I revisited the rain effect I did for another shader. This one is better in multiple ways:
-// 1. The glass gets foggy.
-// 2. Drops cut trails in the fog on the glass.
-// 3. The amount of rain is adjustable (with Mouse.y)
+      
+      float random(float val, float f1, float f2) {
+        return fract(sin(val*f1)*f2);
+      }
+      
+      
+      vec2 rand(vec2 c){
+          mat2 m = mat2(12.9898,.16180,78.233,.31415);
+        return fract(sin(m * c) * vec2(43758.5453, 14142.1));
+      }
+      
+      vec2 noise(vec2 p){
+        vec2 co = floor(p);					// grid pixelize
+        vec2 mu = fract(p);					// blur
+        mu = 3.*mu*mu-2.*mu*mu*mu;			// blur more
+        vec2 a = rand((co+vec2(0.,0.)));
+        vec2 b = rand((co+vec2(1.,0.)));
+        vec2 c = rand((co+vec2(0.,1.)));
+        vec2 d = rand((co+vec2(1.,1.)));
+        return mix(mix(a, b, mu.x), mix(c, d, mu.x), mu.y);
+      }
+      
+      vec4 sh() {
+        vec4 f;
+        vec2 c = gl_FragCoord.xy;
+        vec2 u = gl_FragCoord.xy / iResolution.xy;
+        //u -= 0.5;
+        vec2 v = (c*.1)/ iResolution.xy;
+          vec2 n = noise(v*200.); 	// Displacement
+          
+          //f = textureLod(iChannel0, u, 0.); 		// render background - number is blurring
+          
+         
+          vec2 x = iResolution.xy*0.01;  		// Number of potential drops (in a grid)
+          vec2 p = 6.28 * u * x + (n - .5) * 2.;	// round shape
+          vec2 s = sin(p);						// amount in cell
+           
+        // Current drop properties. Coordinates are rounded to ensure a
+        // consistent value among the fragment of a given drop.
+        //vec4 d = texture2D(iChannel1, round(u * x - 0.25) / x);
+        //vec2 v2 = round(u * x - 0.25) / x;
+        vec2 v2 = (u * x - 0.25);
+        v2 = sign(v2.xy)*(floor(abs(v2.xy)+0.5)) / x;
+        
 
-#define S(a, b, t) smoothstep(a, b, t)
-//#define USE_POST_PROCESSING
+        vec4 d = vec4(noise(v2*200.), noise(v2));
+        
+        // Drop shape and fading
+        float t = (s.x+s.y);
+        t = (s.x+s.y)* max(0., 1. - fract(iTime*0.005 * (d.b + .1) + d.g) * 4.); 		// fading
+                
+        // d.r -> only x% of drops are kept on, with x depending on the size of drops
+         float pct = 0.03;
+        if (d.r < (5.)*pct && t > .5) {					// 0.5 makes shape within cell - cutoff - must be rounded
+          // Drop normal
+          vec3 v1 = normalize(-vec3(cos(p), mix(.2, 2., t-.5)));
+          //f = vec4(v1 * 0.5 + 0.5, 1.0); 	 // show normals
+          
+          // Poor man's refraction (no visual need to do more)
+          f = texture2D(iChannel0, (u - v1.xy) * .2);		// number is amount of refraction
+        }
+        
+        
+        //if (d.x >= .5) {f += vec4(1.);}	// Debug uv
+          
+          //f = vec4(n, 0.0, 1.0);			// Debug noise function
+          //f = vec4(vec3(t) ,1.0);				// Debug drop shape
+          //fragColor = vec4(u.x, u.y, 0., 1.);
+          //fragColor = f;
+          return f;
+          
+      }
 
-vec3 N13(float p) {
-    //  from DAVE HOSKINS
-   vec3 p3 = fract(vec3(p) * vec3(.1031,.11369,.13787));
-   p3 += dot(p3, p3.yzx + 19.19);  
-   return fract(vec3((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y, (p3.y+p3.z)*p3.x));
-}
+      vec2 Drop(vec2 uv, float t) {
+        t *= 4.;							// scale time
+        
+        vec2 a = vec2 (1.,1);			// aspect of grid cell
+        a = vec2(iResolution.x/iResolution.y); // aspect of grid cell based on image
+        
+        // st used for main drop - uv used for additional drops
+        vec2 st = uv*a;					// uv to aspect
+        
+        // grid cell id's
+        vec2 id = floor(st);
+        
+        // position of drop
+        float y = 0.0;
+        float x = 0.0;								// x location in grid
+        
+        x = dropPosition.x;           // from external
+        y = dropPosition.y;
+        vec2 p1 = vec2(x, y);						// set position, y only
+        
+        // make it round
+        // Large displace
+        vec2 offset1 = (p1-st) / a;				// offset inside box to follow box, used for getting uv
+        offset1 *= 0.3;							// size control
+        float d = length(offset1);				// distance to center of box
+        float mask1 = S(.03, .22, d);			// mask to make fuzzy or not
 
-vec4 N14(float t) {
-	return fract(sin(t*vec4(123., 1024., 1456., 264.))*vec4(6547., 345., 8799., 1564.));
-}
+        // small displace
+        vec2 offset2 = (p1-st) / a;				// offset inside box to follow box, used for getting uv
+        offset2 *= 1.;							// size control
+        float d2= length(offset2);				// distance to center of box
+        float mask2 = S(.05, .12, d2);			// mask to make fuzzy or not
+        
+        // strength, makes uv mask scaled + makes ofsett different for each pixel
+        float sm1 = 30.;
+        float sm2 = 10.;
+        
+        // make drops
+        vec2 drops = vec2(mask1*offset1*sm1);
+        drops += vec2(mask2*offset2*sm2);
+        //vec2 drops = vec2(mask2*offset2*sm2);
+        //vec2 drops = vec2(mask2*offset2*sm2);
+        //drops += vec2(mask2*offset2*sm2);
+        
+        //vec4 shader2 = sh();
+        //drops += shader2.xy-vec2(0.1,0.1);
+        //vec2 dropG = DropGrid(uvCopy, t);
+        //drops += dropG;
+        return vec2(drops);
+      }
 
-float N(float t) {
-    return fract(sin(t*12345.564)*7658.76);
-}
+      vec2 DropReflection(vec2 drops, float l0, float l1, float l2) {
+          float s; 		// = StaticDrops(uv, t)*l0; 
+          vec2 m1; 		// = DropLayer2(uv, t)*l1;
+          //vec2 m2 = DropLayer2(uv*1.85, t)*l2;
+          vec2 m2;
+          m1 = drops;
+          
+          float c = s+m1.x+m2.x;
+          //c = S(.3, 1., c);
+          
+          return vec2(c, m1.y);//max(m1.y*l0, m2.y*l1));
+      }
 
-float Saw(float b, float t) {
-	return S(0., b, t)*S(1., b, t);
-}
+      void main()
+      {
+          vec2 uv = (gl_FragCoord.xy/iResolution.xy)*0.5 -0.5;
+          //(gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
+          vec2 UV = gl_FragCoord.xy/iResolution.xy * 0.5;
+          
+          //FROM ORIGINAL: vec2 st = (gl_FragCoord.xy /resolution.xy) *.5;
 
-// mouseY is how heavy/much is rains
-// mouseX is how varied it is, and running up down..
-vec2 M;
+          // Time
+          float T = iTime; // + M.x*2.;
+          float t = T*.2;
 
-vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
-    vec2 UV = uv;
-    
-    uv.y += t*0.75;					// modifies falling
-    vec2 a = vec2(6., 1.);			// shape of drop in y direction of falling drops
-    vec2 grid = a*2.;				// *2. makes the rain fall down < 2, makes some fall up
-    vec2 id = floor(uv*grid);
-    
-    
-    float colShift = N(id.x); 
-    uv.y += colShift;
-    
-    id = floor(uv*grid);
-    vec3 n = N13(id.x*35.2+id.y*2376.1);
-    vec2 st = fract(uv*grid)-vec2(.5, 0);	// grid of falling drops
-    
-    float x = n.x-.5;
-    
-    // Trail wiggle
-    float y = UV.y*20.;
-    float wiggle = sin(y+sin(y));
-    x += wiggle*(.5-abs(x))*(n.z-.5);
-    x *= .9;
-    float ti = fract(t+n.z);			// time modifier, so they dont fall in unison
-    y = (Saw(.85, ti)-.5)*.9+.5;
-    vec2 p = vec2(x, y);				// position
-    
-    float d = length((st-p) * a.yx);	// distance
-    
-    float mainDrop = S(.4, .0, d);
-    
-    
-    float r = sqrt(S(1., y, st.y));		// trail
-    float cd = abs(st.x-x);
-    float trail = S(.23*r, .15*r*r, cd);
-    float trailFront = S(-.02, .02, st.y-y);
-    trail *= trailFront*r*r;
-    
-    y = UV.y;
-    float trail2 = S(.2*r, .0, cd);
-    float droplets= max(0., (sin(y*(1.-y)*120.)-st.y))*trail2*trailFront*n.z;
-    y = fract(y*10.)+(st.y-.5);
-    float dd = length(st-vec2(x, y));
-    droplets = S(.3, 0., dd);
-    
-    float m = mainDrop+droplets*r*trailFront;
-    
-    
-    // ----- BIG DROP -----
-    //uvCopy should be -0.5 to 0.5
-    float MDx = 0.;
-    float MDy = 0.;
-     //MDx = M.x;
-     //MDy = M.y;
-     MDx = dropPosition.x;
-     MDy = dropPosition.y;
-     
-    // displace
-    //float y = UV.y*20.;
-    float MDwiggle; //=  sin(MDx*0.1);// = sin(MDy+sin(MDy));
-    //MDx += MDwiggle*(.5-abs(MDx))*(n.z-.5);
-    MDx += MDwiggle*abs(MDx)*(n.z-.5);
-    
-    vec2 MDp = vec2(MDx, MDy);
-    
-    vec2 MDa = vec2(1.,1);
-    
-    // make it round
-	  vec2 MDoffset = ((MDp-uvCopy));		// offset inside box to follow box, used for getting uv
-	  MDoffset *= 1.;							// size control
-	  float MDd = length(MDoffset * MDa.yx);				// distance to center of box
-    float MDmask = S(0.18, -0.2, MDd);				// mask to make fuzzy or not
-    float MDscalar = 10.;
-    vec2 MDdrop = vec2(MDmask*MDscalar);
-    
-    // ----- BIG DROP END -----
-    
-    
-    // GRID DEBUG
-    //m += st.x>a.y*.45 || st.y>a.x*.165 ? 1.2 : 0.;
-    
-    vec2 final = vec2(m, trail);
-    return final += MDdrop;
-    //return MDdrop;
-}
+        // Make drops with UVs
+          vec2 dropDistort = Drop(uv, T);
+          
+          // MAKE REFLECTIONS
+          float layer1 = S(.25, .75, 0.3);
+          vec2 c = DropReflection(dropDistort, layer1, 0., 0.);
+          vec2 e = vec2(.001, 0.);
+          
+          vec2 dropDistort1 = Drop(uv+e, T);
+          vec2 dropDistort2 = Drop(uv+e.yx, T);
+          float cx = DropReflection(dropDistort1, layer1, 0., 0.).x;
+          float cy = DropReflection(dropDistort2, layer1, 0., 0.).x;
 
-float StaticDrops(vec2 uv, float t) {
-	uv *= 40.;
-    
-    vec2 id = floor(uv);
-    uv = fract(uv)-.5;
-    vec3 n = N13(id.x*107.45+id.y*3543.654);
-    vec2 p = (n.xy-.5)*.7;
-    float d = length(uv-p);
-    
-    float fade = Saw(.025, fract(t+n.z));
-    float c = S(.3, 0., d)*fract(n.z*10.)*fade;
-    return c;
-}
+          // n IS THE DROP
+          //float cx = Drops(uv+e, t, staticDrops, layer1, layer2).x;
+          //float cy = Drops(uv+e.yx, t, staticDrops, layer1, layer2).x;
+          vec2 n = vec2(cx-c.x, cy-c.x);		// expensive normals
+          
 
-vec2 Drops(vec2 uv, float t, float l0, float l1, float l2) {
-    float s;// = StaticDrops(uv, t)*l0; 
-    vec2 m1;// = DropLayer2(uv, uv, t)*l1;
-    vec2 m2 = DropLayer2(uv, uv*1.85, t)*l2;
+          float rainAmount = 0.3;				// also adjusts the amount of blur -  min= 0.3
     
-    float c = s+m1.x+m2.x;
-    c = S(.3, 1., c);
+          // MAKE THE BLUR
+          float maxBlur = mix(3., 6., rainAmount);
+          float minBlur = 1.;
+          // APPLY THE BLUR
+          float focus = mix((maxBlur-c.y)*0.5*0.5, minBlur, S(.1, .2, c.y));
+          //focus = mix((maxBlur-c.y)*0.5*0.5, minBlur, S(.1, .2, c.y-0.5));
+          //focus = mix((maxBlur-c.x)*0.5*0.5, minBlur, S(.1, .2, c.x-0.5));
+          //focus = mix((maxBlur-c.x)*0.5*0.5, focus, S(.1, .2, c.x-0.5));
+          focus *= 0.6;
     
-    return vec2(c, max(m1.y*l0, m2.y*l1));
-}
+          // drop + blur
+          vec4 col = texture2D(iChannel0, vUv+n, focus); 
+          
+          //vec4 col = f;
+          //col = vec4(dropDistort, 0, 1.);
+          // col += vec4(dropDistort, 0, 1.);     // UV DEBUG
+          
+          //if (uv.y > 0.49) {col = vec4(1.0,0.0,0.0,1.0);}   // check that mapping of uv is -0.5 to 0.5
+          
+          //f = texture2D(iChannel0, (u - v1.xy) * .3);
+          //fragColor = col;  
+          //gl_FragColor = col;
+          // SHADER 2
+    
+          vec4 shader2 = sh();
+          col = max(col, shader2); 
+          //col = mix(col, shader2, 0.1); 
+          gl_FragColor = col; 
 
-void main()
-{
-	//vec2 uv = (gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
-    vec2 UV = gl_FragCoord.xy/iResolution.xy;
-    vec2 uv = (gl_FragCoord.xy/iResolution.xy)*0.5 -0.5;
-    //(gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
-    // vec2 UV = gl_FragCoord.xy/iResolution.xy * 0.5;
-    
-    M = iMouse.xy/iResolution.xy;
-    M -= 0.5;
-    
-    // Time
-    float T = iTime *0.01; // + M.x*2.;
-    float t = T*.2;
-    
-    
-    float rainAmount = 0.3;				// also adjusts the amount of blur -  min= 0.3
-    
-    // MAKE THE BLUR - MAKES THE TRAILS POSSIBLE
-    float maxBlur = mix(3., 6., rainAmount);
-    float minBlur = 1.;
-    
-    // MAKE THE DROPS
-    float staticDrops = S(-.5, 1., rainAmount)*2.;
-    float layer1 = S(.25, .75, rainAmount);
-    float layer2 = S(.0, .5, rainAmount);
-    vec2 c = Drops(uv, t, staticDrops, layer1, layer2);
+      }
 
-	// MAKE REFLECTIONS
-    vec2 e = vec2(.001, 0.);
-    float cx = Drops(uv+e, t, staticDrops, layer1, layer2).x;
-    float cy = Drops(uv+e.yx, t, staticDrops, layer1, layer2).x;
-    vec2 n = vec2(cx-c.x, cy-c.x);		// expensive normals		---- PLAY WITH THESE FOR ANISO
-    
-    // APPLY THE BLUR
-    float focus = mix(maxBlur-c.y, minBlur, S(.1, .2, c.x));
-    
-    vec3 col = texture2D(iChannel0, UV*0.5+n, focus).rgb;
-    
-    
-    
-    #ifdef USE_POST_PROCESSING
-    t = (T+3.)*.5;										// make time sync with first lightnoing
-    float colFade = sin(t*.2)*.5+.5;
-    col *= mix(vec3(1.), vec3(.8, .9, 1.3), colFade);	// subtle color shift
-    float fade = S(0., 10., T);							// fade in at the start
-    col *= 1.-dot(UV-=.5, UV);							// vignette
-    
-    col *= fade;										// composite start and end fade
-    #endif
-    
-    
-    // DEBUG NORMAL MAP
-    //col = vec3(uv,0.);
-    //col = vec3(c,0.);
-    //col = vec3(n,0.);
-    //col = vec3(n*20.,0.);
-    
-    gl_FragColor = vec4(col, 1.);
-}
    </script>
 
     <!-- THREE JS MODULE -->
