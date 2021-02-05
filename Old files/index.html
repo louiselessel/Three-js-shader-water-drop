@@ -103,6 +103,71 @@
       float random(float val, float f1, float f2) {
         return fract(sin(val*f1)*f2);
       }
+      
+      
+      vec2 rand(vec2 c){
+          mat2 m = mat2(12.9898,.16180,78.233,.31415);
+        return fract(sin(m * c) * vec2(43758.5453, 14142.1));
+      }
+      
+      vec2 noise(vec2 p){
+        vec2 co = floor(p);					// grid pixelize
+        vec2 mu = fract(p);					// blur
+        mu = 3.*mu*mu-2.*mu*mu*mu;			// blur more
+        vec2 a = rand((co+vec2(0.,0.)));
+        vec2 b = rand((co+vec2(1.,0.)));
+        vec2 c = rand((co+vec2(0.,1.)));
+        vec2 d = rand((co+vec2(1.,1.)));
+        return mix(mix(a, b, mu.x), mix(c, d, mu.x), mu.y);
+      }
+      
+      vec4 sh() {
+        vec4 f;
+         vec2 c = gl_FragCoord.xy;
+        vec2 u = gl_FragCoord.xy / iResolution.xy;
+        //u -= 0.5;
+        vec2 v = (c*.1)/ iResolution.xy;
+          vec2 n = noise(v*200.); 	// Displacement
+          
+          //f = textureLod(iChannel0, u, 0.); 		// render background - number is blurring
+          
+         
+          vec2 x = iResolution.xy*0.01;  		// Number of potential drops (in a grid)
+          vec2 p = 6.28 * u * x + (n - .5) * 2.;	// round shape
+          vec2 s = sin(p);						// amount in cell
+           
+        // Current drop properties. Coordinates are rounded to ensure a
+        // consistent value among the fragment of a given drop.
+        //vec4 d = texture(iChannel1, round(u * x - 0.25) / x);
+        vec2 v2 = round(u * x - 0.25) / x;
+        vec4 d = vec4(noise(v2*200.), noise(v2));
+        
+        // Drop shape and fading
+        float t = (s.x+s.y);
+        t = (s.x+s.y)* max(0., 1. - fract(iTime*0.005 * (d.b + .1) + d.g) * 4.); 		// fading
+                
+        // d.r -> only x% of drops are kept on, with x depending on the size of drops
+         float pct = 0.03;
+        if (d.r < (5.)*pct && t > .5) {					// 0.5 makes shape within cell - cutoff - must be rounded
+          // Drop normal
+          vec3 v1 = normalize(-vec3(cos(p), mix(.2, 2., t-.5)));
+          //f = vec4(v1 * 0.5 + 0.5, 1.0); 	 // show normals
+          
+          // Poor man's refraction (no visual need to do more)
+          f = texture(iChannel0, (u - v1.xy) * .2);		// number is amount of refraction
+        }
+        
+        
+        //if (d.x >= .5) {f += vec4(1.);}	// Debug uv
+          
+          //f = vec4(n, 0.0, 1.0);			// Debug noise function
+           //f = vec4(vec3(t) ,1.0);				// Debug drop shape
+           
+           //fragColor = vec4(u.x, u.y, 0., 1.);
+          //fragColor = f;
+          return f;
+          
+      }
 
       vec2 Drop(vec2 uv, float t) {
         t *= 4.;							// scale time
@@ -125,16 +190,33 @@
         vec2 p1 = vec2(x, y);						// set position, y only
         
         // make it round
+        // Large displace
         vec2 offset1 = (p1-st) / a;				// offset inside box to follow box, used for getting uv
+        offset1 *= 0.3;							// size control
         float d = length(offset1);				// distance to center of box
-        float mask1 = S(.02, .12, d);			// mask to make fuzzy or not
+        float mask1 = S(.03, .22, d);			// mask to make fuzzy or not
+
+        // small displace
+        vec2 offset2 = (p1-st) / a;				// offset inside box to follow box, used for getting uv
+        offset2 *= 1.;							// size control
+        float d2= length(offset2);				// distance to center of box
+        float mask2 = S(.05, .12, d2);			// mask to make fuzzy or not
         
         // strength, makes uv mask scaled + makes ofsett different for each pixel
         float sm1 = 30.;
+        float sm2 = 10.;
         
         // make drops
-        vec2 drops = vec2(mask1*offset1*sm1);	
+        vec2 drops = vec2(mask1*offset1*sm1);
+        drops += vec2(mask2*offset2*sm2);
+        //vec2 drops = vec2(mask2*offset2*sm2);
+        //vec2 drops = vec2(mask2*offset2*sm2);
+        //drops += vec2(mask2*offset2*sm2);
         
+        //vec4 shader2 = sh();
+        //drops += shader2.xy-vec2(0.1,0.1);
+        //vec2 dropG = DropGrid(uvCopy, t);
+        //drops += dropG;
         return vec2(drops);
       }
 
@@ -192,7 +274,7 @@
           //focus = mix((maxBlur-c.y)*0.5*0.5, minBlur, S(.1, .2, c.y-0.5));
           //focus = mix((maxBlur-c.x)*0.5*0.5, minBlur, S(.1, .2, c.x-0.5));
           //focus = mix((maxBlur-c.x)*0.5*0.5, focus, S(.1, .2, c.x-0.5));
-          focus *= 0.5;
+          focus *= 0.6;
     
           // drop + blur
           vec4 col = texture2D(iChannel0, vUv+n, focus); 
@@ -205,7 +287,14 @@
           
           //f = texture(iChannel0, (u - v1.xy) * .3);
           //fragColor = col;  
-          gl_FragColor = col;    
+          //gl_FragColor = col;
+          // SHADER 2
+    
+          vec4 shader2 = sh();
+          col = max(col, shader2); 
+          //col = mix(col, shader2, 0.1); 
+          gl_FragColor = col; 
+
       }
 
    </script>
@@ -352,7 +441,8 @@
           iTime: { type: "f", value: 1.0 },
           iResolution: { type: "v2", value: new THREE.Vector2() },
           dropPosition: { type: "v2", value: new THREE.Vector2() },
-          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/app_background_1080x1920.jpg') }
+          //iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/app_background_1080x1920.jpg') }
+          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_3.jpg') }
         };
 
 
@@ -400,7 +490,7 @@
         var y = document.getElementById('Orientation_b').innerHTML;
         var xAccel = document.getElementById('Accelerometer_x').innerHTML;
         var yAccel = document.getElementById('Accelerometer_y').innerHTML;
-        var gyroVal = 60;
+        var gyroVal = 50;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           dropPos.x = valx;
@@ -413,8 +503,8 @@
         }
 
         // MOUSE DEBUG
-        dropPos.x = iMouse.x;
-        dropPos.y = iMouse.y;
+        //dropPos.x = iMouse.x;
+        //dropPos.y = iMouse.y;
         //console.log(dropPos.x);
         //console.log('loc');
         //console.log(location.x);
