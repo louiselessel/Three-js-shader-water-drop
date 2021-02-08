@@ -334,12 +334,18 @@ void main()
       var uniforms, material, mesh;
       let camera;
       //const textureIn = new THREE.TextureLoader().load( "./textures/Lorem_Ipsum_Univers55.png" );
+      var elapsedMilliseconds;
+      var timeScalar = 0.01;
       const iMouse = new THREE.Vector2();
       const dropPos = new THREE.Vector2();
       const last_dropPos = new THREE.Vector2();
-      var maxforce = 4; // float
-      var maxspeed = 0.1; // float
-      var mass = 0.001;
+
+      var maxforce = 1.; // float
+      var maxspeed = .012; // float
+      var mass = 1.;
+      // var maxforce = 10.; // float
+      // var maxspeed = 0.01; // float
+      // var mass = 0.1;
       var location = new THREE.Vector2(0, 0);
       var acceleration = new THREE.Vector2(0, 0);
       var velocity = new THREE.Vector2(0, 0);
@@ -392,48 +398,71 @@ void main()
         applyForce(steer);
       }
 
-      /*
-      function arrive(PVector target) {
-        PVector desired = PVector.sub(target,location);
-        float d = desired.mag(); //The distance is the magnitude of the vector pointing from location to target.
+      function arrive(target) {
+        // console.log('target');
+        // console.log(target);
+        var desired = new THREE.Vector2(0,0);
+        //console.log(desired); 
+        desired = target.sub(location);
+        var d = desired.length(); //The distance is the magnitude of the vector pointing from location to target.
         desired.normalize();
-        //If we are closer than 100 pixels...
-        if (d < 100) {
+        /*
+        if (elapsedMilliseconds % 500 < 2) {
+          console.log('d');
+          console.log(d); 
+          console.log(desired); 
+        }
+        */
+        
+        
+        //If we are closer than X pixels...
+        var closeness = 100.;
+        if (d < closeness) {
           //...set the magnitude according to how close we are.
-          float m = map(d,0,100,0,maxspeed);
-          desired.mult(m);
+          var m = clamp_map(d,0,closeness,0,maxspeed);
+          //console.log('m');
+          //console.log(m)
+          desired.multiplyScalar(m);
         } else {
           //Otherwise, proceed at maximum speed.
-          desired.mult(maxspeed);
+          //desired.multiplyScalar(maxspeed);
         }
-    
+
         //The usual steering = desired - velocity
-        PVector steer = PVector.sub(desired,velocity);
-        steer.limit(maxforce);
+        var steer = new THREE.Vector2(0.,0.); 
+        steer = desired.sub(velocity);
+        steer.clampLength(0, maxforce);
+
+        // if (elapsedMilliseconds % 1000 < 2) {
+        // console.log('vel'); 
+        // console.log(velocity);
+        // console.log('steer'); 
+        // console.log(steer);
+        // }
+
         applyForce(steer);
       }
-      */
+
 
       // FRICTION UNDER IMPLEMENTATION
 
       function calcForces(posX, posY, forceX, forceY) {
         // additional forces
-        //var gravity = THREE.Vector2(0,0.1); // force example
+        //var gravity = THREE.Vector2(0., 0.1); // force example
         var force = new THREE.Vector2(forceX, forceY); // force
         //var f = applyForce(force);
         //console.log(force);
 
         // seek target
         var target = new THREE.Vector2(posX, posY);
-        //console.log('target');
-        //console.log(target);
         seek(target);
 
-        var test = new THREE.Vector2(1., 1);
-        // update location
-        //velocity.add(test);
-        velocity.add(acceleration);
+        //console.log('target');
+        //console.log(target);
+        arrive(target);
 
+        // update location
+        velocity.add(acceleration);
         velocity.clampLength(0, maxspeed);
         // console.log('velo');
         // console.log(velocity);
@@ -442,7 +471,7 @@ void main()
         //console.log(velocity);
         // console.log('l');
         // console.log(location);
-        acceleration.multiplyScalar(0); //zero out acceleration
+        acceleration.multiplyScalar(0);  //zero out acceleration
         //console.log('acc ZERO');
         //console.log(acceleration);
         return location;
@@ -503,9 +532,9 @@ void main()
       }
 
       function render() {
-        var elapsedMilliseconds = Date.now() - startTime;
+        elapsedMilliseconds = Date.now() - startTime;
         var elapsedSeconds = elapsedMilliseconds / 1000.;
-        uniforms.iTime.value = 60. * elapsedSeconds;
+        uniforms.iTime.value = elapsedMilliseconds * timeScalar;// 60. * elapsedSeconds;
 
         last_dropPos.x = dropPos.x;
         last_dropPos.y = dropPos.y;
@@ -528,12 +557,18 @@ void main()
         }
 
         // MOUSE DEBUG
-        dropPos.x = iMouse.x;
-        dropPos.y = iMouse.y;
+        //dropPos.x = iMouse.x;
+        //dropPos.y = iMouse.y;
         //console.log(dropPos.x);
         //console.log('loc');
         //console.log(location.x);
 
+        // Send just mouse mapping, no forces
+        //uniforms.dropPosition.value.x = dropPos.x;
+        //uniforms.dropPosition.value.y = dropPos.y;
+
+
+        // MAKE FORCES
         //var scalarVec = new THREE.Vector2(0,0);
         //scalarVec = dropPos.distanceTo(last_dropPos);
         //console.log(scalarVec);
@@ -541,18 +576,23 @@ void main()
         //uniforms.dropPosition.value.x = dropPos.x; 
         //uniforms.dropPosition.value.y = dropPos.y; 
 
-        // var newPos = new THREE.Vector2(0,0);
-        // newPos = calcForces(dropPos.x,dropPos.y, 1.0, 1.0);  // target position
-        // console.log('newPos');
-        // console.log(newPos);
+        var newPos = new THREE.Vector2(0,0);
+        //newPos= new THREE.Vector2(dropPos.x, dropPos.y);
+        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
+        //console.log('newPos');
+        //console.log(newPos);
 
-        //uniforms.dropPosition.value.x = newPos.x; 
-        //uniforms.dropPosition.value.y = newPos.y; 
+        var dfinal = newPos.distanceTo(dropPos);
+        //console.log(dfinal);
 
+        if ( dfinal < 0.5) {
+          newPos.xy = dropPos.xy;
+        }
+        
 
-        uniforms.dropPosition.value.x = dropPos.x;
-        uniforms.dropPosition.value.y = dropPos.y;
-
+        // SEND FORCES
+        uniforms.dropPosition.value.x = newPos.x; 
+        uniforms.dropPosition.value.y = newPos.y; 
 
 
 
@@ -581,6 +621,7 @@ void main()
         uniforms.iResolution.value.x = window.innerWidth;
         uniforms.iResolution.value.y = window.innerHeight;
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
       }
     </script>
 
