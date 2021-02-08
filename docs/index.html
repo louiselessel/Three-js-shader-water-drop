@@ -6,9 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title hidden> Julius Bär </title>
   <style>
+    body { margin:0; }
+
     #demo-div {
       color: lightgrey;
-      border-radius: 0.9rem;
+      border-radius: 0.0rem;
     }
 
     #demo-div span,
@@ -30,7 +32,7 @@
     }
 
     #demo-div ul {
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.0rem;
     }
 
     .container {
@@ -48,7 +50,7 @@
       display: grid;
       justify-content: center;
       /*padding: 0.35em 1.2em;*/
-      border: 0.05em solid #FFFFFF;
+      border: 0.05em transparent;
       margin: auto;
       /*margin: 0 0.5em 0.5em 0;*/
       /*border-radius: 0.12em;*/
@@ -193,6 +195,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     float m = mainDrop;//+droplets*r*trailFront;
     
     
+    
     // ----- BIG DROP -----
     //uvCopy should be -0.5 to 0.5
     float MDx = 0.;
@@ -226,13 +229,20 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     float MDscalar = 10.;
     vec2 MDdrop = vec2(MDmask*MDscalar);
     
+    
     // ----- BIG DROP END -----
     
     // GRID DEBUG
     //m += st.x>a.y*.45 || st.y>a.x*.165 ? 1.2 : 0.;
 
     vec2 final = vec2(m, trail);
-    return final += MDdrop;
+    final += MDdrop;
+
+    // GRID EDGES
+    if (uvCopy.x > 0.49 || uvCopy.x < -0.49) { final += vec2(0.,1.); }
+    if (uvCopy.y > 0.495 || uvCopy.y < -0.495) { final += vec2(0.,1.); }
+
+    return final;
     //return MDdrop;
 }
 
@@ -275,8 +285,7 @@ void main()
     // Time
     float T = iTime *0.01; // + M.x*2.;
     float t = T*.2;
-    
-    
+  
     float rainAmount = 0.3;				// also adjusts the amount of blur -  min= 0.3
     
     // MAKE THE BLUR - MAKES THE TRAILS POSSIBLE
@@ -326,6 +335,17 @@ void main()
 
     <!-- THREE JS MODULE -->
     <script type="module">
+
+
+      // TO DO
+      /*
+        - remove jitter
+        - calibrate
+        - prevent fold around
+        - 
+      */
+
+
       import * as THREE from './build/three.module.js'
       console.log("hello");
 
