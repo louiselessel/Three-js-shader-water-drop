@@ -668,10 +668,10 @@ void main()
         }
 
       // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - ignore
-      if (Math.sign(y) == -1 && dropPos.y <= last_dropPos.y) {  // keep going up
+      if (Math.sign(y) == -1 && valy <= last_dropPos.y) {  // keep going up
         dropPos.y = valy;
       }      
-      if (Math.sign(y) == 1 && dropPos.y >= last_dropPos.y) {  // keep going down
+      if (Math.sign(y) == 1 && valy >= last_dropPos.y) {  // keep going down
         dropPos.y = valy;
       }
       /*
