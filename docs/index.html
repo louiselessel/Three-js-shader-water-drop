@@ -675,7 +675,12 @@ void main()
       if ( (Math.sign(y) == 1) && (valy < last_dropPos.y)) {  // keep going up // 
         dropPos.y = valy;
       }      
-
+      if ( (Math.sign(x) == -1) && (valx > last_dropPos.x)) {  // keep going up // 
+        dropPos.x = valx;
+      }    
+      if ( (Math.sign(x) == 1) && (valx < last_dropPos.x)) {  // keep going up // 
+        dropPos.x = valx;
+      }      
       /*if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
         dropPos.y = valy;
       }
