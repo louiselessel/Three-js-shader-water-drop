@@ -228,7 +228,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     float MDmask = S(0.18, -0.2, MDd);				// mask to make fuzzy or not
     float MDscalar = 10.;
     vec2 MDdrop = vec2(MDmask*MDscalar);
-    
+
     
     // ----- BIG DROP END -----
     
@@ -516,7 +516,7 @@ void main()
           iResolution: { type: "v2", value: new THREE.Vector2() },
           dropPosition: { type: "v2", value: new THREE.Vector2() },
           //iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/app_background_1080x1920.jpg') }
-          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_3.jpg') }
+          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') }
         };
 
 
@@ -645,7 +645,7 @@ void main()
       }
     </script>
 
-    <button id="mybutton">Start</button>
+    <button id="mybutton">START</button>
 
     <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
