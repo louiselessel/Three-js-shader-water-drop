@@ -100,17 +100,17 @@
       uniform sampler2D iChannel0;
       
       // Based on
-// Heartfelt - by Martijn Steinrucken aka BigWings - 2017
-// Email:countfrolic@gmail.com Twitter:@The_ArtOfCode
-// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+      // Heartfelt - by Martijn Steinrucken aka BigWings - 2017
+      // Email:countfrolic@gmail.com Twitter:@The_ArtOfCode
+      // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
-// I revisited the rain effect I did for another shader. This one is better in multiple ways:
-// 1. The glass gets foggy.
-// 2. Drops cut trails in the fog on the glass.
-// 3. The amount of rain is adjustable (with Mouse.y)
+      // I revisited the rain effect I did for another shader. This one is better in multiple ways:
+      // 1. The glass gets foggy.
+      // 2. Drops cut trails in the fog on the glass.
+      // 3. The amount of rain is adjustable (with Mouse.y)
 
-#define S(a, b, t) smoothstep(a, b, t)
-//#define USE_POST_PROCESSING
+      #define S(a, b, t) smoothstep(a, b, t)
+      //#define USE_POST_PROCESSING
 
 vec3 N13(float p) {
     //  from DAVE HOSKINS
@@ -527,15 +527,12 @@ void main()
           iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') }
         };
 
-
-        //uniforms[ "textureIn" ].value.wrapS = uniforms[ "texture" ].value.wrapT = THREE.RepeatWrapping;
-
         material = new THREE.ShaderMaterial({
           uniforms: uniforms,
           vertexShader: document.getElementById('vertexShader').textContent,
           fragmentShader: document.getElementById('fragmentShader').textContent
         });
-        var plane = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
+        var plane = new THREE.PlaneBufferGeometry(clientWidth, clientHeight);
 			  mesh = new THREE.Mesh(plane, material);
         //mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
         scene.add(mesh);
@@ -617,19 +614,19 @@ void main()
         if ( dfinal < 0.5) {
           newPos.xy = dropPos.xy;
         }
-        
 
         // SEND FORCES
         uniforms.dropPosition.value.x = newPos.x; 
         uniforms.dropPosition.value.y = newPos.y; 
-
-
 
         // render static cam
         renderer.render(scene, camera);
       }
 
 
+
+
+      
 
 
       function updateFieldIfNotNull(fieldName, value, precision = 10) {
@@ -646,7 +643,9 @@ void main()
       }
 
       function onWindowResize() {
-        //camera.aspect = clientWidth / clientHeight;
+        clientWidth = window.innerWidth;
+        clientHeight = window.innerHeight;
+        camera.aspect = clientWidth / clientHeight;
         uniforms.iResolution.value.x = clientWidth;
         uniforms.iResolution.value.y = clientHeight;
         renderer.setSize(clientWidth, clientHeight);
