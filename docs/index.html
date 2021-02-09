@@ -619,8 +619,6 @@ void main()
         var elapsedSeconds = elapsedMilliseconds / 1000.;
         uniforms.iTime.value = elapsedMilliseconds * timeScalar;// 60. * elapsedSeconds;
 
-        last_dropPos.x = dropPos.x;
-        last_dropPos.y = dropPos.y;
 
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
@@ -651,19 +649,40 @@ void main()
         }
         */
 
+
+        last_dropPos.x = dropPos.x;
+        last_dropPos.y = dropPos.y;
+
         var gyroVal = 5;
+        var valx;
+        var valy;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
-          dropPos.x = valx;
+          //dropPos.x = valx;
           updateFieldIfNotNull('Mapped_X', valx);
         }
         if (y != null && y < gyroVal && y > -gyroVal) {
           var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
-          dropPos.y = valy;
+          //dropPos.y = valy;
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
-        /*
+      // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - ignore
+      if (Math.sign(y) == -1 && dropPos.y <= last_dropPos.y) {  // keep going up
+        dropPos.y = valy;
+      }      
+      if (Math.sign(y) == 1 && dropPos.y >= last_dropPos.y) {  // keep going down
+        dropPos.y = valy;
+      }
+      if (Math.sign(x) == -1 && dropPos.x <= last_dropPos.x) {  // keep going left
+        dropPos.x = valx;
+      }
+      if (Math.sign(x) == 1 && dropPos.x >= last_dropPos.x) {  // keep going right
+        dropPos.x = valx;
+      }
+
+
+        /* // bad idea forces to accel
         var force = new THREE.Vector2();
         var amount = 0.1;
         // which way are we tilted  - add extra force in that direction.
@@ -674,6 +693,7 @@ void main()
        // applyForce(force)
       */
       
+        // get stuck at edges
       // if at top < -0.48, and y is neg - stay at top
         // if at top and y becomes pos - move towards target
         if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5} // stay up
