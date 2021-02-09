@@ -652,6 +652,7 @@ void main()
 
         last_dropPos.x = dropPos.x;
         last_dropPos.y = dropPos.y;
+        console.log(last_dropPos);
 
         var gyroVal = 30;
         var valx;
@@ -668,7 +669,7 @@ void main()
         }
 
       // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - update, else ignore
-      if (Math.sign(y) == -1 && valy < last_dropPos.y) {  // keep going up
+      if ( (valy > last_dropPos.y)) {  // keep going up // (Math.sign(y) == -1) &&
         dropPos.y = valy;
       }      
       /*if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
