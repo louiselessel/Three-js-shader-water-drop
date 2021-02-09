@@ -499,16 +499,15 @@ void main()
         //If we are closer than X pixels...
         var closeness = 30.;
         if (d < closeness) {
-                    //Otherwise, proceed at maximum speed.
-                    desired.multiplyScalar(maxspeed);
-
-        } else {
-          desired.multiplyScalar(abs(yAccel));
           //...set the magnitude according to how close we are.
           var m = clamp_map(d,0,closeness,0,maxspeed);
           //console.log('m');
           //console.log(m)
           desired.multiplyScalar(m);
+        } else {
+          //Otherwise, proceed at maximum speed.
+          desired.multiplyScalar(maxspeed);
+          //desired.multiplyScalar(abs(yAccel));
         }
 
         //The usual steering = desired - velocity
