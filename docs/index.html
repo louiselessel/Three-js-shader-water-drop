@@ -582,8 +582,8 @@ void main()
         }
 
         // MOUSE DEBUG
-        dropPos.x = iMouse.x;
-        dropPos.y = iMouse.y;
+        //dropPos.x = iMouse.x;
+        //dropPos.y = iMouse.y;
         //console.log(dropPos.x);
         //console.log('loc');
         //console.log(location.x);
@@ -607,12 +607,13 @@ void main()
         //console.log('newPos');
         //console.log(newPos);
 
+        /*
         var dfinal = newPos.distanceTo(dropPos);
         //console.log(dfinal);
-
         if ( dfinal < 0.5) {
           newPos.xy = dropPos.xy;
         }
+        */
 
         // SEND FORCES
         uniforms.dropPosition.value.x = newPos.x; 
@@ -655,7 +656,7 @@ void main()
     <button id="mybutton">START</button>
 
     <!--// add hidden here -->
-    <div  class="p-3 mb-2 bg-secondary" id="demo-div">
+    <div class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
       <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
