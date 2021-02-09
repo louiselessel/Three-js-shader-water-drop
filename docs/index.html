@@ -667,14 +667,14 @@ void main()
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
-      // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - ignore
+      // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - update, else ignore
       if (Math.sign(y) == -1 && valy < last_dropPos.y) {  // keep going up
         dropPos.y = valy;
       }      
-      if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
+      /*if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
         dropPos.y = valy;
       }
-      /*
+      
       if (Math.sign(x) == -1 && dropPos.x <= last_dropPos.x) {  // keep going left
         dropPos.x = valx;
       }
@@ -719,12 +719,9 @@ void main()
         var newPos = new THREE.Vector2(0,0);
         //newPos= new THREE.Vector2(dropPos.x, dropPos.y);    // straight mapped to movement
         
-       
         // dropPos.x = iMouse.x;          // MOUSE DEBUG
         // dropPos.y = iMouse.y;
 
-
-        
         newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
         //console.log(newPos);
