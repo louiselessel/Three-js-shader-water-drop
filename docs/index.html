@@ -236,8 +236,8 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     //float x = n.x-.5;
 
     //float y = UV.y*20.;
-    //float MDwiggle;// = sin(iTime);//sin(MDx*0.1); // = sin(MDy+sin(MDy));
-    //MDx += MDwiggle*(.5-abs(MDx))*(n.z-.5);
+    float MDwiggle;//= sin(MDy+sin(MDy));// = sin(iTime);//sin(MDx*0.1);
+    MDx += MDwiggle*(.5-abs(MDx))*(n.z-.5);
     //MDx += MDwiggle*abs(MDx)*(n.z-.5);
     
     vec2 MDp = vec2(MDx, MDy);
@@ -277,7 +277,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     //m += st.x>a.y*.45 || st.y>a.x*.165 ? 1.2 : 0.;
 
     vec2 final = vec2(m, trail);
-    //final += MDdrop;
+    final += MDdrop;
     final += _MDdrop;
 
     // GRID EDGES
