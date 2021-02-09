@@ -643,7 +643,21 @@ void main()
 
         
         // map the tilt
+        /*
         var gyroVal = 60;
+        if (x != null && x < gyroVal && x > -gyroVal) {
+          var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
+          dropPos.x = valx;
+          updateFieldIfNotNull('Mapped_X', valx);
+        }
+        if (y != null && y < gyroVal && y > -gyroVal) {
+          var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
+          dropPos.y = valy;
+          updateFieldIfNotNull('Mapped_Y', valy);
+        }
+        */
+
+        var gyroVal = 10;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           dropPos.x = valx;
@@ -727,7 +741,7 @@ void main()
     <button id="mybutton">START</button>
 
     <!--// add hidden here -->
-    <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
+    <div  class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
       <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
