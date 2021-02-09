@@ -503,7 +503,7 @@ void main()
                     desired.multiplyScalar(maxspeed);
 
         } else {
-          //desired.multiplyScalar(abs(yAccel));
+          desired.multiplyScalar(abs(yAccel));
           //...set the magnitude according to how close we are.
           var m = clamp_map(d,0,closeness,0,maxspeed);
           //console.log('m');
