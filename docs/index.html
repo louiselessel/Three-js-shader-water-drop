@@ -657,12 +657,12 @@ void main()
         var valx;
         var valy;
         if (x != null && x < gyroVal && x > -gyroVal) {
-          var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
+          valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           //dropPos.x = valx;
           updateFieldIfNotNull('Mapped_X', valx);
         }
         if (y != null && y < gyroVal && y > -gyroVal) {
-          var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
+          valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
           //dropPos.y = valy;
           updateFieldIfNotNull('Mapped_Y', valy);
         }
