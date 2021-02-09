@@ -584,7 +584,7 @@ void main()
         else {ext.x = 1.;}
         
         // map the tilt
-        var gyroVal = 50;
+        var gyroVal = 60;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
           dropPos.x = valx;
