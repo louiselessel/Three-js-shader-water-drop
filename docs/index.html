@@ -532,8 +532,9 @@ void main()
           vertexShader: document.getElementById('vertexShader').textContent,
           fragmentShader: document.getElementById('fragmentShader').textContent
         });
-
-        mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+        var plane = new THREE.PlaneBufferGeometry(window.innerWidth, window.innerHeight);
+			  mesh = new THREE.Mesh(plane, material);
+        //mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
         scene.add(mesh);
 
         uniforms.iResolution.value.x = clientWidth;
