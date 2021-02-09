@@ -634,14 +634,8 @@ void main()
         //ext.y += Math.abs(yAccel);
         //ext.x += xAccel;
         //ext.y += yAccel;
-
-        // set aspect
-        // if (Math.sign(x) == 1 ) ext.x = 1.5; // positive
-        // if (Math.sign(x) == -1 ) ext.x = 1.5; // negative
-        // if (Math.sign(y) == 1 ) ext.y = 1.5; // positive
-
-
         
+        // OLD
         // map the tilt
         /*
         var gyroVal = 60;
@@ -670,6 +664,8 @@ void main()
         }
 
 
+
+
         // MAKE FORCES
         //var scalarVec = new THREE.Vector2(0,0);
         //scalarVec = dropPos.distanceTo(last_dropPos);
@@ -685,6 +681,15 @@ void main()
         // dropPos.x = iMouse.x;          // MOUSE DEBUG
         // dropPos.y = iMouse.y;
 
+        var force = new THREE.Vector2();
+        var amount = 1.5
+        // which way are we tilted  - add extra force in that direction.
+        if (Math.sign(x) == 1 ) force.x = amount;    // right
+        if (Math.sign(x) == -1 ) force.x = amount;   // left
+        if (Math.sign(y) == 1 ) force.y = amount;    // up
+        if (Math.sign(y) == 1 ) force.y = amount ;    // down
+
+        applyForce(force)
         
         newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
