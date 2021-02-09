@@ -80,6 +80,7 @@
       uniform vec2 iResolution;
       uniform vec2 dropPosition;
       uniform sampler2D iChannel0;
+      
 
       void main()	{
         //gl_Position = vec4(position, 1.0 );
@@ -96,6 +97,7 @@
       uniform float iTime;
       uniform vec2 dropPosition;
       //vec2 dropPosition = vec2(0.5,0.5);
+      uniform vec2 ext;
 
       uniform sampler2D iChannel0;
       
@@ -217,7 +219,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     vec2 MDp = vec2(MDx, MDy);
     
     // EXTERNAL VECTOR direction
-    vec2 ext = vec2(1.,1.);
+    //ext = vec2(1.,1.);
     vec2 MDa = vec2(1.5,1);
     MDa *= ext;
     
@@ -357,6 +359,8 @@ void main()
       const iMouse = new THREE.Vector2();
       const dropPos = new THREE.Vector2();
       const last_dropPos = new THREE.Vector2();
+      let xAccel;
+      let yAccel;
 
       // var maxforce = 1.; // float
       // var maxspeed = .012; // float
@@ -369,6 +373,7 @@ void main()
       var maxforce = 1.; // float
       var maxspeed = 1.; // float
       var mass = 1.;
+      var ext = new THREE.Vector2(1.,1.); // for accelerometer data
 
 
       var location = new THREE.Vector2(0, 0);
@@ -439,7 +444,7 @@ void main()
         */
         
         //If we are closer than X pixels...
-        var closeness = 50.;
+        var closeness = 30.;
         if (d < closeness) {
           //...set the magnitude according to how close we are.
           var m = clamp_map(d,0,closeness,0,maxspeed);
@@ -449,6 +454,7 @@ void main()
         } else {
           //Otherwise, proceed at maximum speed.
           desired.multiplyScalar(maxspeed);
+          desired.multiplyScalar(abs(yAccel));
         }
 
         //The usual steering = desired - velocity
@@ -520,7 +526,8 @@ void main()
           iResolution: { type: "v2", value: new THREE.Vector2() },
           dropPosition: { type: "v2", value: new THREE.Vector2() },
           //iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/app_background_1080x1920.jpg') }
-          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') }
+          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') }, 
+          ext: { type: "v2", value: ext }
         };
 
         material = new THREE.ShaderMaterial({
@@ -564,8 +571,15 @@ void main()
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
         var y = document.getElementById('Orientation_b').innerHTML;
-        var xAccel = document.getElementById('Accelerometer_x').innerHTML;
-        var yAccel = document.getElementById('Accelerometer_y').innerHTML;
+        xAccel = document.getElementById('Accelerometer_x').innerHTML;
+        yAccel = document.getElementById('Accelerometer_y').innerHTML;
+        
+        // set the aceelerometer data
+        ext = new THREE.Vector2(1.,1.);
+        ext.x += Math.abs(xAccel);
+        ext.y += Math.abs(yAccel);
+        
+        // map the tilt
         var gyroVal = 50;
         if (x != null && x < gyroVal && x > -gyroVal) {
           var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
@@ -578,7 +592,7 @@ void main()
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
-        // MOUSE DEBUG
+        
       
         //console.log(dropPos.x);
         //console.log('loc');
@@ -598,15 +612,18 @@ void main()
         //uniforms.dropPosition.value.y = dropPos.y; 
 
         var newPos = new THREE.Vector2(0,0);
-        newPos= new THREE.Vector2(dropPos.x, dropPos.y);
-
-        dropPos.x = iMouse.x;
-        dropPos.y = iMouse.y;
-        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
+        //newPos= new THREE.Vector2(dropPos.x, dropPos.y);    // straight mapped to movement
+        
+       
+        // dropPos.x = iMouse.x;          // MOUSE DEBUG
+        // dropPos.y = iMouse.y;
+        
+        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
         //console.log(newPos);
 
         /*
+        // stop jitter
         var dfinal = newPos.distanceTo(dropPos);
         //console.log(dfinal);
         if ( dfinal < 0.5) {
@@ -617,6 +634,7 @@ void main()
         // SEND FORCES
         uniforms.dropPosition.value.x = newPos.x; 
         uniforms.dropPosition.value.y = newPos.y; 
+        uniforms.ext.value = ext;
 
         // render static cam
         renderer.render(scene, camera);
