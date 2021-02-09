@@ -575,9 +575,13 @@ void main()
         yAccel = document.getElementById('Accelerometer_y').innerHTML;
         
         // set the aceelerometer data
-        ext = new THREE.Vector2(1.,1.);
-        ext.x += Math.abs(xAccel);
-        ext.y += Math.abs(yAccel);
+        // ext = new THREE.Vector2(1.,1.);
+        // ext.x += Math.abs(xAccel);
+        // ext.y += Math.abs(yAccel);
+
+        // set aspect
+        if (Math.sign(x) == 1 ) ext.y = 2.; // positive
+        else {ext.y = 1.;}
         
         // map the tilt
         var gyroVal = 50;
