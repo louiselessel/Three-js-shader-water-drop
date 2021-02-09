@@ -291,7 +291,7 @@ void main()
     float rainAmount = 0.3;				// also adjusts the amount of blur -  min= 0.3
     
     // MAKE THE BLUR - MAKES THE TRAILS POSSIBLE
-    float maxBlur = mix(3., 6., rainAmount);
+    float maxBlur = mix(2., 6., rainAmount);
     float minBlur = 1.;
     
     // MAKE THE DROPS
@@ -575,13 +575,16 @@ void main()
         yAccel = document.getElementById('Accelerometer_y').innerHTML;
         
         // set the aceelerometer data
-        // ext = new THREE.Vector2(1.,1.);
+        ext = new THREE.Vector2(1.,1.);
         // ext.x += Math.abs(xAccel);
         // ext.y += Math.abs(yAccel);
 
         // set aspect
-        if (Math.sign(x) == 1 ) ext.x = 2.; // positive
-        else {ext.x = 1.;}
+        if (Math.sign(x) == 1 ) ext.x = 1.5; // positive
+        if (Math.sign(x) == -1 ) ext.x = 1.5; // negative
+        if (Math.sign(y) == 1 ) ext.y = 1.5; // positive
+
+
         
         // map the tilt
         var gyroVal = 60;
