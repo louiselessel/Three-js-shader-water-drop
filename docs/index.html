@@ -663,6 +663,19 @@ void main()
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
+        var force = new THREE.Vector2();
+        var amount = 0.1;
+        // which way are we tilted  - add extra force in that direction.
+        if (Math.sign(x) == 1 ) force.x = amount;    // right
+        if (Math.sign(x) == -1 ) force.x = -amount;   // left
+        if (Math.sign(y) == 1 ) force.y = -amount;    // down
+        if (Math.sign(y) == -1 ) force.y = amount ;    // up
+       // applyForce(force)
+
+        // if at top < -0.48, and y is neg - stay at top
+        // if at top and y becomes pos - move towards target
+        if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5}
+        if (valy < -0.48 && Math.sign(y) == 1) {}
 
 
 
@@ -681,15 +694,7 @@ void main()
         // dropPos.x = iMouse.x;          // MOUSE DEBUG
         // dropPos.y = iMouse.y;
 
-        var force = new THREE.Vector2();
-        var amount = 0.1;
-        // which way are we tilted  - add extra force in that direction.
-        if (Math.sign(x) == 1 ) force.x = amount;    // right
-        if (Math.sign(x) == -1 ) force.x = -amount;   // left
-        if (Math.sign(y) == 1 ) force.y = amount;    // up
-        if (Math.sign(y) == -1 ) force.y = -amount ;    // down
 
-        applyForce(force)
         
         newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
