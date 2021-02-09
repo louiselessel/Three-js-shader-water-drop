@@ -685,9 +685,9 @@ void main()
         var amount = 0.1;
         // which way are we tilted  - add extra force in that direction.
         if (Math.sign(x) == 1 ) force.x = amount;    // right
-        if (Math.sign(x) == -1 ) force.x = amount;   // left
+        if (Math.sign(x) == -1 ) force.x = -amount;   // left
         if (Math.sign(y) == 1 ) force.y = amount;    // up
-        if (Math.sign(y) == 1 ) force.y = amount ;    // down
+        if (Math.sign(y) == -1 ) force.y = -amount ;    // down
 
         applyForce(force)
         
