@@ -212,7 +212,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     //float x = n.x-.5;
 
     //float y = UV.y*20.;
-    float MDwiggle = sin(MDx*0.1);// = sin(MDy+sin(MDy));
+    float MDwiggle = sin(iTime);//sin(MDx*0.1); // = sin(MDy+sin(MDy));
     //MDx += MDwiggle*(.5-abs(MDx))*(n.z-.5);
     MDx += MDwiggle*abs(MDx)*(n.z-.5);
     
@@ -221,7 +221,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     // EXTERNAL VECTOR direction
     //ext = vec2(1.,1.);
     vec2 MDa = vec2(1.5,1);
-    MDa *= ext;
+    MDa *= ext * abs(sin(iTime*0.01));
     
     // make it round
 	  vec2 MDoffset = ((MDp-uvCopy));		// offset inside box to follow box, used for getting uv
@@ -229,7 +229,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
 	  float MDd = length(MDoffset * MDa.yx);				// distance to center of box
     float MDmask = S(0.18, -0.2, MDd);				// mask to make fuzzy or not
     float MDscalar = 10.;
-    vec2 MDdrop = vec2(MDmask*MDscalar);
+    vec2 MDdrop = vec2(MDmask*MDscalar);    
 
     
     // ----- BIG DROP END -----
@@ -580,9 +580,9 @@ void main()
         // ext.y += Math.abs(yAccel);
 
         // set aspect
-        if (Math.sign(x) == 1 ) ext.x = 1.5; // positive
-        if (Math.sign(x) == -1 ) ext.x = 1.5; // negative
-        if (Math.sign(y) == 1 ) ext.y = 1.5; // positive
+        // if (Math.sign(x) == 1 ) ext.x = 1.5; // positive
+        // if (Math.sign(x) == -1 ) ext.x = 1.5; // negative
+        // if (Math.sign(y) == 1 ) ext.y = 1.5; // positive
 
 
         
