@@ -345,6 +345,13 @@ void main()
         - 
       */
 
+      var clientWidth = window.innerWidth; // function () {  return Math.max(window.innerWidth, document.documentElement.clientWidth);};
+      var clientHeight = window.innerHeight; //function () {  return Math.max(window.innerHeight, document.documentElement.clientHeight);};
+       clientWidth = document.documentElement.clientWidth;
+       clientHeight = document.documentElement.clientHeight;
+
+      console.log(window.innerWidth);
+      console.log(document.documentElement.clientWidth);
 
       import * as THREE from './build/three.module.js'
       console.log("hello");
@@ -380,8 +387,8 @@ void main()
         // calculate mouse position in normalized device coordinates
         // (-0.5 to +0.5) for both components
 
-        iMouse.x = (event.clientX / window.innerWidth) - 0.5;
-        iMouse.y = ((event.clientY / window.innerHeight) - 0.5) * -1.;
+        iMouse.x = (event.clientX / clientWidth) - 0.5;
+        iMouse.y = ((event.clientY / clientHeight) - 0.5) * -1.;
         //console.log(iMouse.y);
         updateFieldIfNotNull('Mouse_X', iMouse.x);
         updateFieldIfNotNull('Mouse_Y', iMouse.y);
@@ -463,7 +470,6 @@ void main()
         applyForce(steer);
       }
 
-
       // FRICTION UNDER IMPLEMENTATION
 
       function calcForces(posX, posY, forceX, forceY) {
@@ -498,7 +504,6 @@ void main()
       }
 
 
-
       function init() {
         /* SETUP */
         camera = new THREE.Camera();
@@ -531,15 +536,15 @@ void main()
         mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
         scene.add(mesh);
 
-        uniforms.iResolution.value.x = window.innerWidth;
-        uniforms.iResolution.value.y = window.innerHeight;
+        uniforms.iResolution.value.x = clientWidth;
+        uniforms.iResolution.value.y = clientHeight;
         uniforms.dropPosition.value.x = 0.0;
         uniforms.dropPosition.value.y = 0.0;
         /* END SHADER STUFF */
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setSize(clientWidth, clientHeight);
         document.body.appendChild(renderer.domElement);
 
         window.addEventListener('resize', onWindowResize, false);
@@ -577,8 +582,8 @@ void main()
         }
 
         // MOUSE DEBUG
-        //dropPos.x = iMouse.x;
-        //dropPos.y = iMouse.y;
+        dropPos.x = iMouse.x;
+        dropPos.y = iMouse.y;
         //console.log(dropPos.x);
         //console.log('loc');
         //console.log(location.x);
@@ -597,8 +602,8 @@ void main()
         //uniforms.dropPosition.value.y = dropPos.y; 
 
         var newPos = new THREE.Vector2(0,0);
-        //newPos= new THREE.Vector2(dropPos.x, dropPos.y);
-        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
+        newPos= new THREE.Vector2(dropPos.x, dropPos.y);
+        //newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
         //console.log('newPos');
         //console.log(newPos);
 
@@ -637,10 +642,10 @@ void main()
       }
 
       function onWindowResize() {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        uniforms.iResolution.value.x = window.innerWidth;
-        uniforms.iResolution.value.y = window.innerHeight;
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = clientWidth / clientHeight;
+        uniforms.iResolution.value.x = clientWidth;
+        uniforms.iResolution.value.y = clientHeight;
+        renderer.setSize(clientWidth, clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
       }
     </script>
@@ -730,36 +735,6 @@ void main()
 
     let is_running = false;
     let demo_button = document.getElementById("mybutton");
-
-    // Button click will TO BE REMOVED
-    /*
-    window.onload = function (e) {
-      e.preventDefault();
-      // Request permission for iOS 13+ devices
-      if (
-        DeviceMotionEvent &&
-        typeof DeviceMotionEvent.requestPermission === "function"
-      ) {
-        DeviceMotionEvent.requestPermission();
-      }
-
-      // if (is_running) {
-      //   window.removeEventListener("devicemotion", handleMotion);
-      //   window.removeEventListener("deviceorientation", handleOrientation);
-      //   demo_button.innerHTML = "Start demo";
-      //   demo_button.classList.add('btn-success');
-      //   demo_button.classList.remove('btn-danger');
-      //   is_running = false;
-      // } else {
-        window.addEventListener("devicemotion", handleMotion);
-        window.addEventListener("deviceorientation", handleOrientation);
-        // document.getElementById("start_demo").innerHTML = "Stop demo";
-        // demo_button.classList.remove('btn-success');
-        // demo_button.classList.add('btn-danger');
-        // is_running = true;
-      }
-    };
-    */
 
     demo_button.onclick = function (e) {
       e.preventDefault();
