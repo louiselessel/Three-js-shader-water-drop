@@ -663,6 +663,7 @@ void main()
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
+        /*
         var force = new THREE.Vector2();
         var amount = 0.1;
         // which way are we tilted  - add extra force in that direction.
@@ -671,8 +672,9 @@ void main()
         if (Math.sign(y) == 1 ) force.y = -amount;    // down
         if (Math.sign(y) == -1 ) force.y = amount ;    // up
        // applyForce(force)
-
-        // if at top < -0.48, and y is neg - stay at top
+      */
+      
+      // if at top < -0.48, and y is neg - stay at top
         // if at top and y becomes pos - move towards target
         if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5}
         if (valy < -0.48 && Math.sign(y) == 1) {}
