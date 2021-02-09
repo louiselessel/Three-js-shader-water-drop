@@ -668,10 +668,10 @@ void main()
         }
 
       // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - ignore
-      if (Math.sign(y) == -1 && valy <= last_dropPos.y) {  // keep going up
+      if (Math.sign(y) == -1 && valy < last_dropPos.y) {  // keep going up
         dropPos.y = valy;
       }      
-      if (Math.sign(y) == 1 && valy >= last_dropPos.y) {  // keep going down
+      if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
         dropPos.y = valy;
       }
       /*
@@ -695,6 +695,7 @@ void main()
        // applyForce(force)
       */
       
+      /*
         // get stuck at edges
       // if at top < -0.48, and y is neg - stay at top
         // if at top and y becomes pos - move towards target
@@ -704,7 +705,7 @@ void main()
         //if (valy > 0.48 && Math.sign(y) == -1) {}
         if (valx < -0.48 && Math.sign(x) == -1) { dropPos.x = -0.5} // stay left
         if (valx > 0.48 && Math.sign(x) == 1) { dropPos.x = 0.5}  // stay right
-
+      */
 
 
         // MAKE FORCES
