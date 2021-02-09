@@ -336,15 +336,6 @@ void main()
     <!-- THREE JS MODULE -->
     <script type="module">
 
-
-      // TO DO
-      /*
-        - remove jitter
-        - calibrate
-        - prevent fold around
-        - 
-      */
-
       var clientWidth = window.innerWidth; // function () {  return Math.max(window.innerWidth, document.documentElement.clientWidth);};
       var clientHeight = window.innerHeight; //function () {  return Math.max(window.innerHeight, document.documentElement.clientHeight);};
        clientWidth = document.documentElement.clientWidth;
@@ -367,12 +358,19 @@ void main()
       const dropPos = new THREE.Vector2();
       const last_dropPos = new THREE.Vector2();
 
-      var maxforce = 1.; // float
-      var maxspeed = .012; // float
-      var mass = 1.;
+      // var maxforce = 1.; // float
+      // var maxspeed = .012; // float
+      // var mass = 1.;
       // var maxforce = 10.; // float
       // var maxspeed = 0.01; // float
       // var mass = 0.1;
+
+      // just friction
+      var maxforce = 1.; // float
+      var maxspeed = 1.; // float
+      var mass = 1.;
+
+
       var location = new THREE.Vector2(0, 0);
       var acceleration = new THREE.Vector2(0, 0);
       var velocity = new THREE.Vector2(0, 0);
@@ -440,9 +438,8 @@ void main()
         }
         */
         
-        
         //If we are closer than X pixels...
-        var closeness = 100.;
+        var closeness = 50.;
         if (d < closeness) {
           //...set the magnitude according to how close we are.
           var m = clamp_map(d,0,closeness,0,maxspeed);
@@ -451,7 +448,7 @@ void main()
           desired.multiplyScalar(m);
         } else {
           //Otherwise, proceed at maximum speed.
-          //desired.multiplyScalar(maxspeed);
+          desired.multiplyScalar(maxspeed);
         }
 
         //The usual steering = desired - velocity
@@ -480,7 +477,7 @@ void main()
 
         // seek target
         var target = new THREE.Vector2(posX, posY);
-        seek(target);
+        //seek(target);
 
         //console.log('target');
         //console.log(target);
@@ -582,8 +579,7 @@ void main()
         }
 
         // MOUSE DEBUG
-        //dropPos.x = iMouse.x;
-        //dropPos.y = iMouse.y;
+      
         //console.log(dropPos.x);
         //console.log('loc');
         //console.log(location.x);
@@ -603,7 +599,10 @@ void main()
 
         var newPos = new THREE.Vector2(0,0);
         newPos= new THREE.Vector2(dropPos.x, dropPos.y);
-        //newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
+
+        dropPos.x = iMouse.x;
+        dropPos.y = iMouse.y;
+        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);  // target position
         //console.log('newPos');
         //console.log(newPos);
 
