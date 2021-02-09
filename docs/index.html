@@ -261,7 +261,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     vec2 MDdrop = vec2(MDmask*MDscalar);  
 
     
-    vec2 _ofs = MDp + vec2(0.08,.008); //+ext;
+    vec2 _ofs = MDp + vec2(0.05,.008); //+ext;
     // smaller drop
     vec2 _MDoffset = ((_ofs-uvCopy));		// offset inside box to follow box, used for getting uv
 	  _MDoffset *= 4. * max(abs(sin(iTime*0.01)), .8);							// size control
@@ -270,7 +270,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     float _MDscalar = 10.;
     vec2 _MDdrop = vec2(_MDmask*_MDscalar);  
 
-    vec2 _ofs_ = MDp + vec2(-0.05,-0.03); //+ext;
+    vec2 _ofs_ = MDp + vec2(-0.02,-0.03); //+ext;
     // smaller drop
     vec2 _MDoffset_ = ((_ofs_-uvCopy));		// offset inside box to follow box, used for getting uv
 	  _MDoffset_ *= 3. * max((sin((iTime+5.)*0.001)), .8);							// size control
@@ -727,7 +727,7 @@ void main()
     <button id="mybutton">START</button>
 
     <!--// add hidden here -->
-    <div class="p-3 mb-2 bg-secondary" id="demo-div">
+    <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
       <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
