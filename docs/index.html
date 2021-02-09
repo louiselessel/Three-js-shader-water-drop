@@ -676,8 +676,12 @@ void main()
       
       // if at top < -0.48, and y is neg - stay at top
         // if at top and y becomes pos - move towards target
-        if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5}
-        if (valy < -0.48 && Math.sign(y) == 1) {}
+        if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5} // stay up
+        //if (valy < -0.48 && Math.sign(y) == 1) {}
+        if (valy > 0.48 && Math.sign(y) == 1) { dropPos.y = 0.5} // stay down
+        //if (valy > 0.48 && Math.sign(y) == -1) {}
+        if (valx < -0.48 && Math.sign(x) == -1) { dropPos.x = -0.5} // stay left
+        if (valx > 0.48 && Math.sign(x) == 1) { dropPos.x = 0.5}  // stay right
 
 
 
