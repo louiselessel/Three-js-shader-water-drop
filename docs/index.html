@@ -261,7 +261,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     vec2 MDdrop = vec2(MDmask*MDscalar);  
 
 
-    vec2 ofs = ext;
+    vec2 ofs = ext*0.1;
     // smaller drop
     vec2 _MDoffset = ((ofs-uvCopy));		// offset inside box to follow box, used for getting uv
 	  _MDoffset *= 2.;							// size control
