@@ -1,10 +1,6 @@
 <!doctype html>
 <html lang="en">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title hidden> Julius Bär </title>
   <style>
     body { margin:0; }
 
@@ -67,6 +63,12 @@
       border-radius: 50%;
     }
   </style>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title hidden> Julius Bär </title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
 </head>
 
 <body>
@@ -391,14 +393,14 @@ void main()
 
       var clientWidth = window.innerWidth; // function () {  return Math.max(window.innerWidth, document.documentElement.clientWidth);};
       var clientHeight = window.innerHeight; //function () {  return Math.max(window.innerHeight, document.documentElement.clientHeight);};
-       clientWidth = document.documentElement.clientWidth;
-       clientHeight = document.documentElement.clientHeight;
+      // clientWidth = document.documentElement.clientWidth;
+      // clientHeight = document.documentElement.clientHeight;
 
-      console.log(window.innerWidth);
-      console.log(document.documentElement.clientWidth);
+      //console.log(window.innerWidth);
+      //console.log(document.documentElement.clientWidth);
 
-      import * as THREE from './build/three.module.js'
-      console.log("hello");
+      //import * as THREE from './build/three.module.js'
+      //console.log("hello");
 
       let scene, renderer, controls;
       var startTime;
@@ -413,19 +415,11 @@ void main()
       let xAccel;
       let yAccel;
 
-      // var maxforce = 1.; // float
-      // var maxspeed = .012; // float
-      // var mass = 1.;
-      // var maxforce = 10.; // float
-      // var maxspeed = 0.01; // float
-      // var mass = 0.1;
-
       // just friction
       var maxforce = 1.; // float
       var maxspeed = .4; // float
       var mass = 2.;
       var ext = new THREE.Vector2(1.,1.); // for accelerometer data
-
 
       var location = new THREE.Vector2(0, 0);
       var acceleration = new THREE.Vector2(0, 0);
