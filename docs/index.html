@@ -7,28 +7,6 @@
       border-radius: 0.0rem;
     }
 
-    #demo-div span,
-    #demo-div #num-observed-events {
-      color: black;
-    }
-
-    h1 {
-      margin-top: 0.0rem;
-    }
-
-    h4 {
-      margin-top: 0.0rem;
-      font-size: 1.33rem;
-    }
-
-    #demo-div li {
-      line-height: 21px;
-    }
-
-    #demo-div ul {
-      margin-bottom: 0.0rem;
-    }
-
     .container {
       position: absolute;
       width: 100vw;
@@ -584,7 +562,8 @@ void main()
       }
 
       function animate() {
-        window.requestAnimationFrame(animate);
+        //window.requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
         render();
       }
 
@@ -731,10 +710,7 @@ void main()
       }
 
 
-
-
-      
-
+      // --------- FUNCTIONS -----------
 
       function updateFieldIfNotNull(fieldName, value, precision = 10) {
         if (value != null)
@@ -760,11 +736,12 @@ void main()
       }
     </script>
 
+
     <button id="mybutton">START</button>
 
     <!--// add hidden here -->
-    <div  class="p-3 mb-2 bg-secondary" id="demo-div">
-      <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
+    <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
+    <!--<a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>-->
       <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
 
