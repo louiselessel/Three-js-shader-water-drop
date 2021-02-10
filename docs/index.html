@@ -1,57 +1,59 @@
 <html>
-  <style>
-    body { 
-      margin:0;
-    }
+<style>
+  body {
+    margin: 0;
+    overflow:hidden;
+  }
 
+  /*
     .WebContainer {
       width:100%;
       min-width:1000px;
       height:auto;
     }
-    /*
-    .container {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    */
+  */
+  .container {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
-    button {
-      z-index: 265;
-      display: grid;
-      justify-content: center;
-      /*padding: 0.35em 1.2em;*/
-      border: 0.05em transparent;
-      margin: auto;
-      /*margin: 0 0.5em 0.5em 0;*/
-      /*border-radius: 0.12em;*/
-      /*box-sizing: border-box;*/
-      /*text-decoration: none;*/
-      font-family: 'Roboto', sans-serif;
-      font-weight: 200;
-      font-size: x-large;
-      color: #FFFFFF;
-      text-align: center;
-      background-color: transparent;
-      /*transition: all 0.2s;*/
-      padding: 10%;
-      border-radius: 50%;
-    }
-  </style>
+
+  button {
+    z-index: 265;
+    display: grid;
+    justify-content: center;
+    /*padding: 0.35em 1.2em;*/
+    border: 0.05em transparent;
+    margin: auto;
+    /*margin: 0 0.5em 0.5em 0;*/
+    /*border-radius: 0.12em;*/
+    /*box-sizing: border-box;*/
+    /*text-decoration: none;*/
+    font-family: 'Roboto', sans-serif;
+    font-weight: 200;
+    font-size: x-large;
+    color: #FFFFFF;
+    text-align: center;
+    background-color: transparent;
+    /*transition: all 0.2s;*/
+    padding: 10%;
+    border-radius: 50%;
+  }
+</style>
 
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=0.5">
-  <title > Julius Bär </title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title> Julius Bär </title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
 </head>
 
 <body>
   <main role="main" class="container">
-   <!-- <h1 hidden align="left">Julius Bär</h1> -->
+    <!-- <h1 hidden align="left">Julius Bär</h1> -->
 
     <script id="vertexShader" type="x-shader/x-vertex">
 
@@ -396,7 +398,7 @@ void main()
       var maxforce = 1.; // float
       var maxspeed = .4; // float
       var mass = 2.;
-      var ext = new THREE.Vector2(1.,1.); // for accelerometer data
+      var ext = new THREE.Vector2(1., 1.); // for accelerometer data
 
       var location = new THREE.Vector2(0, 0);
       var acceleration = new THREE.Vector2(0, 0);
@@ -413,8 +415,8 @@ void main()
 
         iMouse.x = (event.clientX / clientWidth) - 0.5;
         iMouse.y = ((event.clientY / clientHeight) - 0.5) * -1.;
-       // uniforms.iMouse.value.x= iMouse.x;
-       // uniforms.iMouse.value.y= iMouse.y;
+        // uniforms.iMouse.value.x= iMouse.x;
+        // uniforms.iMouse.value.y= iMouse.y;
         //console.log(iMouse.y);
         updateFieldIfNotNull('Mouse_X', iMouse.x);
         updateFieldIfNotNull('Mouse_Y', iMouse.y);
@@ -451,17 +453,17 @@ void main()
       }
 
       function arrive(target) {
-        var desired = new THREE.Vector2(0,0);
+        var desired = new THREE.Vector2(0, 0);
         //console.log(desired); 
         desired = target.sub(location);
         var d = desired.length(); //The distance is the magnitude of the vector pointing from location to target.
         desired.normalize();
-        
+
         //If we are closer than X pixels...
         var closeness = 30.;
         if (d < closeness) {
           //...set the magnitude according to how close we are.
-          var m = clamp_map(d,0,closeness,0,maxspeed);
+          var m = clamp_map(d, 0, closeness, 0, maxspeed);
           //console.log('m');
           //console.log(m)
           desired.multiplyScalar(m);
@@ -472,7 +474,7 @@ void main()
         }
 
         //The usual steering = desired - velocity
-        var steer = new THREE.Vector2(0.,0.); 
+        var steer = new THREE.Vector2(0., 0.);
         steer = desired.sub(velocity);
         steer.clampLength(0, maxforce);
 
@@ -519,7 +521,7 @@ void main()
         //camera.position.z = 1.;
         scene = new THREE.Scene();
         camera = new THREE.OrthographicCamera(clientWidth / - 2, clientWidth / 2, clientHeight / 2, clientHeight / - 2, 1, 1000);
-			  camera.position.z = 1;
+        camera.position.z = 1;
 
         location = new THREE.Vector2(0, 0);
         //console.log('location_init');
@@ -534,7 +536,7 @@ void main()
           iResolution: { type: "v2", value: new THREE.Vector2() },
           dropPosition: { type: "v2", value: new THREE.Vector2() },
           //iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/app_background_1080x1920.jpg') }
-          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') }, 
+          iChannel0: { type: "t", value: new THREE.TextureLoader().load('textures/App_4.jpeg') },
           ext: { type: "v2", value: ext }
         };
 
@@ -545,8 +547,8 @@ void main()
         });
         var plane = new THREE.PlaneBufferGeometry(clientWidth, clientHeight);
         //var plane = new THREE.PlaneGeometry(200, 200);
-			  mesh = new THREE.Mesh(plane, material);
-        
+        mesh = new THREE.Mesh(plane, material);
+
         scene.add(mesh);
 
         uniforms.iResolution.value.x = clientWidth;
@@ -581,14 +583,14 @@ void main()
         var y = document.getElementById('Orientation_b').innerHTML;
         xAccel = document.getElementById('Accelerometer_x').innerHTML;
         yAccel = document.getElementById('Accelerometer_y').innerHTML;
-        
+
         // set the aceelerometer data
-        ext = new THREE.Vector2(0.,0.);
+        ext = new THREE.Vector2(0., 0.);
         //ext.x += Math.abs(xAccel);
         //ext.y += Math.abs(yAccel);
         //ext.x += xAccel;
         //ext.y += yAccel;
-        
+
         // OLD
         // map the tilt
         /*
@@ -624,34 +626,34 @@ void main()
           updateFieldIfNotNull('Mapped_Y', valy);
         }
 
-      // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - update, else ignore
-      if ( (Math.sign(y) == -1) && (valy > last_dropPos.y)) {  // keep going up // 
-        dropPos.y = valy;
-      }      
-      if ( (Math.sign(y) == 1) && (valy < last_dropPos.y)) {  // keep going up // 
-        dropPos.y = valy;
-      }      
-      if ( (Math.sign(x) == -1) && (valx < last_dropPos.x)) {  // keep going up // 
-        dropPos.x = valx;
-      }    
-      if ( (Math.sign(x) == 1) && (valx > last_dropPos.x)) {  // keep going up // 
-        dropPos.x = valx;
-      }      
+        // if tilt is neg y and dropPos.y is more neg then last_dropPos.y - update, else ignore
+        if ((Math.sign(y) == -1) && (valy > last_dropPos.y)) {  // keep going up // 
+          dropPos.y = valy;
+        }
+        if ((Math.sign(y) == 1) && (valy < last_dropPos.y)) {  // keep going up // 
+          dropPos.y = valy;
+        }
+        if ((Math.sign(x) == -1) && (valx < last_dropPos.x)) {  // keep going up // 
+          dropPos.x = valx;
+        }
+        if ((Math.sign(x) == 1) && (valx > last_dropPos.x)) {  // keep going up // 
+          dropPos.x = valx;
+        }
 
-      updateFieldIfNotNull('Mouse_X', dropPos.x);
-      updateFieldIfNotNull('Mouse_Y', dropPos.y);
+        updateFieldIfNotNull('Mouse_X', dropPos.x);
+        updateFieldIfNotNull('Mouse_Y', dropPos.y);
 
-      /*
-        // get stuck at edges
-      // if at top < -0.48, and y is neg - stay at top
-        // if at top and y becomes pos - move towards target
-        if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5} // stay up
-        //if (valy < -0.48 && Math.sign(y) == 1) {}
-        if (valy > 0.48 && Math.sign(y) == 1) { dropPos.y = 0.5} // stay down
-        //if (valy > 0.48 && Math.sign(y) == -1) {}
-        if (valx < -0.48 && Math.sign(x) == -1) { dropPos.x = -0.5} // stay left
-        if (valx > 0.48 && Math.sign(x) == 1) { dropPos.x = 0.5}  // stay right
-      */
+        /*
+          // get stuck at edges
+        // if at top < -0.48, and y is neg - stay at top
+          // if at top and y becomes pos - move towards target
+          if (valy < -0.48 && Math.sign(y) == -1) { dropPos.y = -0.5} // stay up
+          //if (valy < -0.48 && Math.sign(y) == 1) {}
+          if (valy > 0.48 && Math.sign(y) == 1) { dropPos.y = 0.5} // stay down
+          //if (valy > 0.48 && Math.sign(y) == -1) {}
+          if (valx < -0.48 && Math.sign(x) == -1) { dropPos.x = -0.5} // stay left
+          if (valx > 0.48 && Math.sign(x) == 1) { dropPos.x = 0.5}  // stay right
+        */
 
 
         // MAKE FORCES
@@ -662,19 +664,19 @@ void main()
         //uniforms.dropPosition.value.x = dropPos.x; 
         //uniforms.dropPosition.value.y = dropPos.y; 
 
-        var newPos = new THREE.Vector2(0,0);
+        var newPos = new THREE.Vector2(0, 0);
         //newPos= new THREE.Vector2(dropPos.x, dropPos.y);    // straight mapped to movement
-        
+
         // dropPos.x = iMouse.x;          // MOUSE DEBUG
         // dropPos.y = iMouse.y;
 
-        newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
+        newPos = calcForces(dropPos.x, dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
         //console.log(newPos);
 
         // SEND FORCES
-        uniforms.dropPosition.value.x = newPos.x; 
-        uniforms.dropPosition.value.y = newPos.y; 
+        uniforms.dropPosition.value.x = newPos.x;
+        uniforms.dropPosition.value.y = newPos.y;
         uniforms.ext.value = ext;
 
         // render static cam
@@ -713,7 +715,7 @@ void main()
 
     <!--// add hidden here -->
     <div hidden class="p-3 mb-2 bg-secondary" id="demo-div">
-    <!--<a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>-->
+      <!--<a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>-->
       <p style="margin-top:1rem;">Num. of datapoints: <span class="badge badge-warning"
           id="num-observed-events">0</span></p>
 
