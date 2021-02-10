@@ -422,7 +422,7 @@ void main()
 
       // just friction
       var maxforce = 1.; // float
-      var maxspeed = .5; // float
+      var maxspeed = .2; // float
       var mass = 2.;
       var ext = new THREE.Vector2(1.,1.); // for accelerometer data
 
@@ -453,7 +453,6 @@ void main()
         var f = new THREE.Vector2(0, 0);
         f = force.divideScalar(mass); //Receive a force, divide by mass, and add to acceleration.
         acceleration.add(f);
-        //return f;
       }
 
       function seek(target) {
@@ -481,20 +480,11 @@ void main()
       }
 
       function arrive(target) {
-        // console.log('target');
-        // console.log(target);
         var desired = new THREE.Vector2(0,0);
         //console.log(desired); 
         desired = target.sub(location);
         var d = desired.length(); //The distance is the magnitude of the vector pointing from location to target.
         desired.normalize();
-        /*
-        if (elapsedMilliseconds % 500 < 2) {
-          console.log('d');
-          console.log(d); 
-          console.log(desired); 
-        }
-        */
         
         //If we are closer than X pixels...
         var closeness = 30.;
@@ -514,13 +504,6 @@ void main()
         var steer = new THREE.Vector2(0.,0.); 
         steer = desired.sub(velocity);
         steer.clampLength(0, maxforce);
-
-        // if (elapsedMilliseconds % 1000 < 2) {
-        // console.log('vel'); 
-        // console.log(velocity);
-        // console.log('steer'); 
-        // console.log(steer);
-        // }
 
         applyForce(steer);
       }
