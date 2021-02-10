@@ -42,7 +42,7 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title > Julius Bär </title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
 </head>
@@ -634,32 +634,10 @@ void main()
       if ( (Math.sign(x) == 1) && (valx > last_dropPos.x)) {  // keep going up // 
         dropPos.x = valx;
       }      
-      /*if (Math.sign(y) == 1 && valy > last_dropPos.y) {  // keep going down
-        dropPos.y = valy;
-      }
-      
-      if (Math.sign(x) == -1 && dropPos.x <= last_dropPos.x) {  // keep going left
-        dropPos.x = valx;
-      }
-      if (Math.sign(x) == 1 && dropPos.x >= last_dropPos.x) {  // keep going right
-        dropPos.x = valx;
-      }
-      */
+
       updateFieldIfNotNull('Mouse_X', dropPos.x);
       updateFieldIfNotNull('Mouse_Y', dropPos.y);
 
-
-        /* // bad idea forces to accel
-        var force = new THREE.Vector2();
-        var amount = 0.1;
-        // which way are we tilted  - add extra force in that direction.
-        if (Math.sign(x) == 1 ) force.x = amount;    // right
-        if (Math.sign(x) == -1 ) force.x = -amount;   // left
-        if (Math.sign(y) == 1 ) force.y = -amount;    // down
-        if (Math.sign(y) == -1 ) force.y = amount ;    // up
-       // applyForce(force)
-      */
-      
       /*
         // get stuck at edges
       // if at top < -0.48, and y is neg - stay at top
@@ -690,15 +668,6 @@ void main()
         newPos = calcForces(dropPos.x,dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
         //console.log(newPos);
-
-        /*
-        // stop jitter
-        var dfinal = newPos.distanceTo(dropPos);
-        //console.log(dfinal);
-        if ( dfinal < 0.5) {
-          newPos.xy = dropPos.xy;
-        }
-        */
 
         // SEND FORCES
         uniforms.dropPosition.value.x = newPos.x; 
