@@ -309,7 +309,8 @@ void main()
 {
 	  //vec2 uv = (gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
     vec2 UV = gl_FragCoord.xy/iResolution.xy;
-    vec2 uv = (gl_FragCoord.xy/iResolution.xy)*0.5 -0.5;
+    //vec2 uv = (gl_FragCoord.xy/iResolution.xy)*0.5 -0.5;
+    vec2 uv = (gl_FragCoord.xy/iResolution.xy)-0.5;
     //(gl_FragCoord.xy-.5*iResolution.xy) / iResolution.y;
     // vec2 UV = gl_FragCoord.xy/iResolution.xy * 0.5;
     
@@ -342,8 +343,8 @@ void main()
     // APPLY THE BLUR
     float focus = mix(maxBlur-c.y, minBlur, S(.1, .2, c.x));
     
-    vec3 col = texture2D(iChannel0, UV*0.5+n, focus).rgb;
-    
+    vec3 col = texture2D(iChannel0, UV+n, focus).rgb;
+    //vec3 col = texture2D(iChannel0, UV*0.5+n, focus).rgb;    
     
     
     #ifdef USE_POST_PROCESSING
