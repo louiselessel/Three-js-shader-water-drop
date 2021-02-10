@@ -5,13 +5,6 @@
     overflow: hidden;
   }
 
-  /*
-    .WebContainer {
-      width:100%;
-      min-width:1000px;
-      height:auto;
-    }
-  */
   .container {
     position: absolute;
     width: 100vw;
@@ -21,7 +14,6 @@
     align-items: center;
   }
 
-
   button {
     z-index: 265;
     display: grid;
@@ -29,10 +21,6 @@
     /*padding: 0.35em 1.2em;*/
     border: 0.05em transparent;
     margin: auto;
-    /*margin: 0 0.5em 0.5em 0;*/
-    /*border-radius: 0.12em;*/
-    /*box-sizing: border-box;*/
-    /*text-decoration: none;*/
     font-family: 'Roboto', sans-serif;
     font-weight: 200;
     font-size: x-large;
@@ -465,10 +453,24 @@ void main()
         desired.normalize();
 
         //If we are closer than X pixels...
-        var closeness = 30.;
+        var closeness = 5.;
         if (d < closeness) {
           //...set the magnitude according to how close we are.
           var m = clamp_map(d, 0, closeness, 0, maxspeed);
+          //console.log('m');
+          //console.log(m)
+          desired.multiplyScalar(m);
+        } else {
+          //Otherwise, proceed at maximum speed.
+          desired.multiplyScalar(maxspeed);
+          //desired.multiplyScalar(abs(yAccel));
+        }
+
+        //If we are further than X pixels...
+        var further = 5.;
+        if (d > further) {
+          //...set the magnitude according to how close we are.
+          var m = clamp_map(d, 0, further, 0, maxspeed *50.);
           //console.log('m');
           //console.log(m)
           desired.multiplyScalar(m);
@@ -611,28 +613,8 @@ void main()
 
         // set the aceelerometer data
         ext = new THREE.Vector2(0., 0.);
-        //ext.x += Math.abs(xAccel);
-        //ext.y += Math.abs(yAccel);
-        //ext.x += xAccel;
-        //ext.y += yAccel;
 
-        // OLD
-        // map the tilt
-        /*
-        var gyroVal = 60;
-        if (x != null && x < gyroVal && x > -gyroVal) {
-          var valx = clamp_map(x, -gyroVal, gyroVal, -0.5, 0.5);
-          dropPos.x = valx;
-          updateFieldIfNotNull('Mapped_X', valx);
-        }
-        if (y != null && y < gyroVal && y > -gyroVal) {
-          var valy = clamp_map(y, gyroVal, -gyroVal, -0.5, 0.5);
-          dropPos.y = valy;
-          updateFieldIfNotNull('Mapped_Y', valy);
-        }
-        */
-
-
+        // save drop movements
         last_dropPos.x = dropPos.x;
         last_dropPos.y = dropPos.y;
         //console.log(last_dropPos);
@@ -692,8 +674,8 @@ void main()
         var newPos = new THREE.Vector2(0, 0);
         //newPos= new THREE.Vector2(dropPos.x, dropPos.y);    // straight mapped to movement
 
-        // dropPos.x = iMouse.x;          // MOUSE DEBUG
-        // dropPos.y = iMouse.y;
+        //dropPos.x = iMouse.x;          // MOUSE DEBUG
+        //dropPos.y = iMouse.y;
 
         newPos = calcForces(dropPos.x, dropPos.y, 0.0, 0.0);   // target position with drag
         //console.log('newPos');
@@ -728,8 +710,8 @@ void main()
         clientWidth = window.innerWidth;
         clientHeight = window.innerHeight;
         camera.aspect = clientWidth / clientHeight;
-        uniforms.iResolution.value.x = clientWidth;
-        uniforms.iResolution.value.y = clientHeight;
+        //uniforms.iResolution.value.x = clientWidth;
+        //uniforms.iResolution.value.y = clientHeight;
         //renderer.setPixelRatio(window.devicePixelRatio);
         //renderer.setSize(clientWidth, clientHeight);
       }
