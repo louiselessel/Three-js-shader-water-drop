@@ -558,7 +558,8 @@ void main()
         /* END SHADER STUFF */
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
         renderer.setSize(clientWidth, clientHeight);
         document.body.appendChild(renderer.domElement);
 
