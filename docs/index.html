@@ -2,7 +2,7 @@
 <style>
   body {
     margin: 0;
-    overflow:hidden;
+    overflow: hidden;
   }
 
   /*
@@ -546,7 +546,7 @@ void main()
           fragmentShader: document.getElementById('fragmentShader').textContent
         });
         var plane = new THREE.PlaneBufferGeometry(clientWidth, clientHeight);
-        //var plane = new THREE.PlaneGeometry(200, 200);
+        //var plane = new THREE.PlaneGeometry(200, 200, 1, 1);
         mesh = new THREE.Mesh(plane, material);
 
         scene.add(mesh);
@@ -558,8 +558,8 @@ void main()
         /* END SHADER STUFF */
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
-        //renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        //renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
         renderer.setSize(clientWidth, clientHeight);
         document.body.appendChild(renderer.domElement);
 
@@ -573,11 +573,28 @@ void main()
         render();
       }
 
+      function resizeRendererToDisplaySize(renderer) {
+        const canvas = renderer.domElement;
+        const pixelRatio = window.devicePixelRatio;
+        const width = canvas.clientWidth * pixelRatio | 0;
+        const height = canvas.clientHeight * pixelRatio | 0;
+        const needResize = canvas.width !== width || canvas.height !== height;
+        if (needResize) {
+          renderer.setSize(width, height, false);
+        }
+        return needResize;
+      }
+
       function render() {
         elapsedMilliseconds = Date.now() - startTime;
         var elapsedSeconds = elapsedMilliseconds / 1000.;
         uniforms.iTime.value = elapsedMilliseconds * timeScalar;// 60. * elapsedSeconds;
 
+        if (resizeRendererToDisplaySize(renderer)) {
+          const canvas = renderer.domElement;
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
+        }
 
         // set info
         var x = document.getElementById('Orientation_g').innerHTML;
