@@ -16,22 +16,24 @@
 
   button {
     z-index: 265;
-    display: grid;
+    width: 100%;
+    height: 100%;
+    display: block;
     justify-content: center;
-    /*padding: 0.35em 1.2em;*/
     border: 0.05em transparent;
     margin: auto;
     font-family: 'Roboto', sans-serif;
-    font-weight: 200;
-    font-size: x-large;
+    font-weight: 300;
+    font-size: xx-large;
     color: #FFFFFF;
     text-align: center;
     background-color: transparent;
     /*transition: all 0.2s;*/
     padding: 10%;
-    border-radius: 50%;
+    border-radius: 0%;
   }
 </style>
+
 
 <head>
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -136,6 +138,8 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     // CORRECT
     //uv.y += t*0.75;					// modifies falling
     //vec2 a = vec2(6., 1.);			// shape of drop in y direction of falling drops
+    
+    //freeze time
     t= 16.;
     uv.y += t*(0.75);					// modifies falling
     vec2 a = vec2(2., 1.);			// shape of drop in y direction of falling drops
@@ -147,7 +151,7 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     
     id = floor(uv*grid);
 
-    // CORRECT
+    // CORRECT OLD
     //vec2 st = fract(uv*grid)-vec2(.5, 0.);	// grid of falling drops
     
     // NEW
@@ -224,23 +228,51 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
 */
     // make it round
 	  vec2 MDoffset = ((MDp-uvCopy));		// offset inside box to follow box, used for getting uv
-	  MDoffset *= 1.;							// size control
+	  MDoffset *= .6;							// size control
 	  float MDd = length(MDoffset * MDa.yx);				// distance to center of box
-    float MDmask = S(0.18, -0.2, MDd);				// mask to make fuzzy or not
+    float MDmask = S(0.18, -0.12, MDd);				// mask to make fuzzy or not
     float MDscalar = 10.;
     vec2 MDdrop = vec2(MDmask*MDscalar);  
 
+    /*
+        // old values
+        // make it round
+	      vec2 MDoffset = ((MDp-uvCopy));		// offset inside box to follow box, used for getting uv
+        MDoffset *= 1.;							// size control
+        float MDd = length(MDoffset * MDa.yx);				// distance to center of box
+        float MDmask = S(0.18, -0.2, MDd);				// mask to make fuzzy or not
+        float MDscalar = 10.;
+        vec2 MDdrop = vec2(MDmask*MDscalar);  
+        
+        vec2 _ofs = MDp + vec2(0.05,.008); //+ext;
+        // smaller drop
+        vec2 _MDoffset = ((_ofs-uvCopy));		// offset inside box to follow box, used for getting uv
+        _MDoffset *= 5. * max(abs(sin(iTime*0.01)), .8);							// size control
+        float _MDd = length(_MDoffset * MDa.yx);				// distance to center of box
+        float _MDmask = S(0.18, -0.2, _MDd);				// mask to make fuzzy or not
+        float _MDscalar = 10.;
+        vec2 _MDdrop = vec2(_MDmask*_MDscalar);  
+
+        vec2 _ofs_ = MDp + vec2(-0.02,-0.03); //+ext;
+        // smaller drop
+        vec2 _MDoffset_ = ((_ofs_-uvCopy));		// offset inside box to follow box, used for getting uv
+        _MDoffset_ *= 3. * max((sin((iTime+5.)*0.001)), .8);							// size control
+        float _MDd_ = length(_MDoffset_ * MDa.yx);				// distance to center of box
+        float _MDmask_ = S(0.18, -0.2, _MDd_);				// mask to make fuzzy or not
+        float _MDscalar_ = 10.;
+        vec2 _MDdrop_ = vec2(_MDmask_*_MDscalar_); 
+    */
     
-    vec2 _ofs = MDp + vec2(0.05,.008); //+ext;
+    vec2 _ofs = MDp + vec2(.1,.08); //+ext;
     // smaller drop
     vec2 _MDoffset = ((_ofs-uvCopy));		// offset inside box to follow box, used for getting uv
-	  _MDoffset *= 4. * max(abs(sin(iTime*0.01)), .8);							// size control
+	  _MDoffset *= 5. * max(abs(sin(iTime*0.01)), .8);							// size control
 	  float _MDd = length(_MDoffset * MDa.yx);				// distance to center of box
     float _MDmask = S(0.18, -0.2, _MDd);				// mask to make fuzzy or not
     float _MDscalar = 10.;
     vec2 _MDdrop = vec2(_MDmask*_MDscalar);  
 
-    vec2 _ofs_ = MDp + vec2(-0.02,-0.03); //+ext;
+    vec2 _ofs_ = MDp + vec2(-0.02,-0.11); //+ext;
     // smaller drop
     vec2 _MDoffset_ = ((_ofs_-uvCopy));		// offset inside box to follow box, used for getting uv
 	  _MDoffset_ *= 3. * max((sin((iTime+5.)*0.001)), .8);							// size control
@@ -261,8 +293,8 @@ vec2 DropLayer2(vec2 uvCopy, vec2 uv, float t) {
     final += _MDdrop_;
 
     // GRID EDGES
-    if (uvCopy.x > 0.49 || uvCopy.x < -0.49) { final += vec2(0.,1.); }
-    if (uvCopy.y > 0.495 || uvCopy.y < -0.495) { final += vec2(0.,1.); }
+    //if (uvCopy.x > 0.49 || uvCopy.x < -0.49) { final += vec2(0.,1.); }
+    //if (uvCopy.y > 0.495 || uvCopy.y < -0.495) { final += vec2(0.,1.); }
 
     return final;
     //return MDdrop;
